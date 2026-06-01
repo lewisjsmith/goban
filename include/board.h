@@ -1,15 +1,20 @@
 #ifndef  BOARD_H
 #define  BOARD_H
 
+#include <vector>
+
 class Board {
 
+    Board();
+    Board(unsigned int);
+
     public:
-    bool setValue(char); 
-    char getValue(char);
+    void set(char, char); 
+    char get(char);
 
     private:
-    char board[9];
-    
+    std::vector<char> board;
+
 };
 
 #endif
