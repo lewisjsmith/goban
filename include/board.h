@@ -5,14 +5,14 @@
 
 class Board {
 
+    public:
     Board();
     Board(unsigned int);
 
-    public:
-    void set(char, char); 
+    void set(char, const char); 
     char get(char);
 
-    private:
+    // private:
     std::vector<char> board;
 
 };
