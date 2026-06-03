@@ -14,6 +14,7 @@ class Board {
 
     // private:
     std::vector<char> board;
+    unsigned int width;
 
 };
 

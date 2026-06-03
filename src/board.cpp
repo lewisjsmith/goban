@@ -1,11 +1,11 @@
 #include "board.h"
 #include <stdexcept>
 
-Board::Board() {
+Board::Board() : width(9) {
     board = std::vector<char>(9*9); 
 }
 
-Board::Board(unsigned int sz) {
+Board::Board(unsigned int sz) : width(sz) {
     if(sz == 9 || sz == 13 || sz == 19) board = std::vector<char>(sz*sz);
     else {
         throw std::runtime_error("Invalid board size");
