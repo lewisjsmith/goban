@@ -12,10 +12,10 @@ Board::Board(unsigned int sz) {
     }
 }
 
-void Board::set(char pos, const char c) {
+void Board::set(unsigned int pos, const char c) {
     board[pos] = c;
 };
 
-char Board::get(char pos) {
+char Board::get(unsigned int pos) {
     return board[pos];
 };

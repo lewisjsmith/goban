@@ -9,8 +9,8 @@ class Board {
     Board();
     Board(unsigned int);
 
-    void set(char, const char); 
-    char get(char);
+    void set(unsigned int, const char); 
+    char get(unsigned int);
 
     // private:
     std::vector<char> board;
