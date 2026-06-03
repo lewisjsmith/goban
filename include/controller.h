@@ -17,6 +17,7 @@ std::vector<unsigned int> getNeighbourPos(Board& board, unsigned int pos) {
     
     if(pos > min) neighbours.push_back(pos - 1);
     if(pos < max) neighbours.push_back(pos + 1);
+    
     if(pos >= width) neighbours.push_back(pos - width);
     if(pos <= max - width) neighbours.push_back(pos + width);
 
