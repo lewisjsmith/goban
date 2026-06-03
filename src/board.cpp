@@ -13,9 +13,13 @@ Board::Board(unsigned int sz) : width(sz) {
 }
 
 void Board::set(unsigned int pos, const char c) {
-    board[pos] = c;
+    char pos_val = get(pos);
+    if(pos_val == 0) board[pos] = c;
 };
 
 char Board::get(unsigned int pos) {
+    if(pos < 0 || pos >= (width*width)) return 3;
     return board[pos];
 };
+
+// Assumes that 0 is empty, 1 is black, 2 is white, 3 is OOB
