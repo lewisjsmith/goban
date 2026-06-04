@@ -12,6 +12,8 @@ std::vector<unsigned int> getNeighbourPos(Board& board, unsigned int pos) {
 
     unsigned int& width = board.width;
 
+    if(pos > width*width - 1) return neighbours;
+
     unsigned int min = 0;
     unsigned int max = (width*width) - 1;
     

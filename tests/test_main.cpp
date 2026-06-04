@@ -20,9 +20,31 @@
     72  73  74  75  76  77  78  79  80
 */
 
+TEST(getNeighbourPosTest, OOB) {
+    Board* board = new Board(9); 
+    std::vector<unsigned int> a = {};
+    std::vector<unsigned int> b = getNeighbourPos(*board, -1);
+    std::vector<unsigned int> c = getNeighbourPos(*board, 81);
+    ASSERT_EQ(a, b);
+    ASSERT_EQ(a, c);
+
+    board = new Board(13); 
+    std::vector<unsigned int> d = {};
+    std::vector<unsigned int> e = getNeighbourPos(*board, -1);
+    std::vector<unsigned int> f = getNeighbourPos(*board, 169);
+    ASSERT_EQ(d, e);
+    ASSERT_EQ(d, f);
+
+    board = new Board(19); 
+    std::vector<unsigned int> g = {};
+    std::vector<unsigned int> h = getNeighbourPos(*board, -1);
+    std::vector<unsigned int> i = getNeighbourPos(*board, 361);
+    ASSERT_EQ(g, h);
+    ASSERT_EQ(g, i);
+}
+
 TEST(getNeighbourPosTest, BoundarySingleStone) {
     Board* board = new Board(9); 
-    board->set(0, 1);
     std::vector<unsigned int> a = getNeighbourPos(*board, 0);
     std::vector<unsigned int> b = {1, 9};
     std::sort(a.begin(), a.end());
@@ -30,17 +52,22 @@ TEST(getNeighbourPosTest, BoundarySingleStone) {
     ASSERT_EQ(a, b);
 
     board = new Board(9); 
-    board->set(9, 1);
     std::vector<unsigned int> c = getNeighbourPos(*board, 9);
     std::vector<unsigned int> d = {0, 10, 18};
     std::sort(c.begin(), c.end());
     std::sort(d.begin(), d.end());
     ASSERT_EQ(c, d);
+
+    board = new Board(9); 
+    std::vector<unsigned int> e = getNeighbourPos(*board, 80);
+    std::vector<unsigned int> f = {71, 79};
+    std::sort(e.begin(), e.end());
+    std::sort(f.begin(), f.end());
+    ASSERT_EQ(e, f);
 }
 
 TEST(getNeighbourPosTest, NonBoundarySingleStone) {
     Board* board = new Board(9); 
-    board->set(11, 2);
     std::vector<unsigned int> a = getNeighbourPos(*board, 11);
     std::vector<unsigned int> b = {2, 10, 12, 20};
     std::sort(a.begin(), a.end());
