@@ -13,16 +13,18 @@ std::vector<unsigned int> getNeighbourPos(Board& board, unsigned int pos) {
     unsigned int& width = board.width;
 
     unsigned int min = 0;
-    unsigned int max = width^2 - 1;
+    unsigned int max = (width*width) - 1;
     
-    if(pos > min) neighbours.push_back(pos - 1);
-    if(pos < max) neighbours.push_back(pos + 1);
-    
+    if(pos > min){
+        if(pos%width != 0) neighbours.push_back(pos - 1);
+    } 
+    if(pos < max){
+        if(pos%(width - 1) != 0 || pos == 0) neighbours.push_back(pos + 1);
+    }
     if(pos >= width) neighbours.push_back(pos - width);
     if(pos <= max - width) neighbours.push_back(pos + width);
 
     return neighbours;
-
 }
 
 bool isAlive(Board& board, unsigned int pos) {
