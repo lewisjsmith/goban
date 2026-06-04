@@ -1,6 +1,8 @@
 #include "board.h"
 #include "controller.h"
+
 #include "gtest/gtest.h"
+
 #include <vector>
 #include <string>
 #include <algorithm>
