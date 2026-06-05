@@ -12,9 +12,17 @@ Board::Board(unsigned int sz) : width(sz) {
     }
 }
 
-void Board::set(unsigned int pos, const char c) {
+bool Board::set(unsigned int pos, const char c) {
     char pos_val = get(pos);
-    if(pos_val == 0) board[pos] = c;
+    if(pos_val == 0){ 
+        board[pos] = c;
+        return true;
+    }
+    else if(c == 0 && (pos_val == 1 || pos_val == 2)){
+        board[pos] = c;
+        return true;
+    }
+    return false;
 };
 
 char Board::get(unsigned int pos) {

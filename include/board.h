@@ -9,7 +9,7 @@ class Board {
     Board();
     Board(unsigned int);
 
-    void set(unsigned int, const char); 
+    bool set(unsigned int, const char); 
     char get(unsigned int);
 
     // private:
