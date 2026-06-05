@@ -46,7 +46,11 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if(cmd == "quit") {
+        if(action == "new") {
+            board = new Board();
+        }
+
+        if(action == "quit") {
             break;
         }
     }
