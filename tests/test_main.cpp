@@ -176,6 +176,52 @@ TEST(getGroupTest, Group) {
     ASSERT_EQ(got, want);
 }
 
+TEST(getLibertiesTest, Group) {
+    Board* board;
+    std::vector<unsigned int> got;
+    std::vector<unsigned int> want;
+
+    board = new Board(9); 
+    board->set(0, 1);
+    board->set(1, 1);
+    board->set(9, 1);
+    got = getLiberties(*board, {0, 1, 9}, 1);
+    want = {2, 10, 18};
+    ASSERT_EQ(got, want);  
+    
+
+    board = new Board(9); 
+    board->set(30, 1);
+    board->set(31, 1);
+    board->set(32, 1);
+    board->set(39, 1);
+    board->set(41, 1);
+    board->set(42, 1);
+    board->set(43, 1);
+    board->set(48, 1);
+    board->set(49, 1);
+    board->set(50, 1);
+    got = getLiberties(*board, {30, 31, 32, 39, 41, 42, 43, 48, 49, 50}, 1);
+    std::sort(got.begin(), got.end());
+    want = {21, 22, 23, 29, 33, 34, 38, 40, 44, 47, 51, 52, 57, 58, 59};
+    ASSERT_EQ(got, want);   
+}
+
+/*
+    9x9 Board Reference
+
+    0   1   2   3   4   5   6   7   8
+    9   10  11  12  13  14  15  16  17
+    18  19  20  21  22  23  24  25  26
+    27  28  29  30  31  32  33  34  35
+    36  37  38  39  40  41  42  43  44
+    45  46  47  48  49  50  51  52  53
+    54  55  56  57  58  59  60  61  62
+    63  64  65  66  67  68  69  70  71
+    72  73  74  75  76  77  78  79  80
+*/
+
+
 // TEST(isAliveTest, AliveSingleStone) {
 //     Board* board = new Board(9);
 //     board->set(0, 1);

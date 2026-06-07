@@ -72,6 +72,22 @@ std::vector<unsigned int> getGroup(Board& board, unsigned int pos, char colour) 
     return group;
 }   
 
+std::vector<unsigned int> getLiberties(Board& board, std::vector<unsigned int> group, char colour) {
+    std::vector<unsigned int> liberties = {};
+    std::unordered_map<unsigned int, bool> seen = {};
+
+    for(auto& s : group){
+        std::vector<unsigned int> neighbours = getNeighbourPos(board, s);
+        for(auto& n : neighbours){
+            if(seen.count(n) != 0) continue;
+            if(board.get(n) != colour) liberties.push_back(n);
+            seen[n] = true;
+        }
+    }
+
+    return liberties;
+}
+
 // std::vector<unsigned int> isAlive(Board& board, unsigned int pos) {
 
 //     char group_colour = board.get(pos);
