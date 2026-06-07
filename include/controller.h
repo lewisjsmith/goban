@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <queue> 
 
+#include <string>
+
 std::vector<unsigned int> getNeighbourPos(Board& board, unsigned int pos) {
     
     std::vector<unsigned int> neighbours;
@@ -29,32 +31,79 @@ std::vector<unsigned int> getNeighbourPos(Board& board, unsigned int pos) {
     return neighbours;
 }
 
-bool isAlive(Board& board, unsigned int pos) {
+// get liberties func ? 
+/*
+    Basically,
+    Save the colour of the last move
+    Check if that last move has opposite colour liberty stones
+    Check if any of those opposite colour stones now have no liberties
+        If not, kill groups
+        Otherwise, check if the placed stone has no liberties
+            If not, kill placed stone
+        Else do nothing 
+*/
 
-    char group_colour = board.get(pos);
+std::vector<unsigned int> getGroup(Board& board, unsigned int pos, char colour) {
+
+    std::vector<unsigned int> group = {};
 
     std::unordered_map<unsigned int, bool> seen = {{pos, true}};
-    std::queue<unsigned int> group_to_check;
-    group_to_check.push(pos);
 
-    while(group_to_check.size() > 0) {
+    std::queue<unsigned int> queue;
+    queue.push(pos);
 
-        unsigned int curr = group_to_check.front();
-        group_to_check.pop();
+    while(!queue.empty()){
 
-        std::vector<unsigned int> curr_neighbours = getNeighbourPos(board, curr);
-        for(auto& n : curr_neighbours){
-            if(seen.count(n) > 0) continue;
-            char curr_neighbour = board.get(n);
-            if(curr_neighbour == 0) return true;
-            if(curr_neighbour == group_colour) group_to_check.push(n);
+        unsigned int curr = queue.front();
+        queue.pop();
+        group.push_back(curr);
+
+        std::vector<unsigned int> neighbours = getNeighbourPos(board, curr);
+        
+        for(auto&n : neighbours){
+            if(seen.count(n) != 0) continue;
+            char neighbour_colour = board.get(n);
+            if(neighbour_colour == colour) queue.push(n);
             seen[n] = true;
         }
 
     }
 
-    return false;
+    return group;
+}   
 
-}
+// std::vector<unsigned int> isAlive(Board& board, unsigned int pos) {
+
+//     char group_colour = board.get(pos);
+
+//     std::unordered_map<unsigned int, bool> seen = {{pos, true}};
+//     std::vector<unsigned int> seen_group = {pos};
+//     std::queue<unsigned int> group_to_check;
+//     group_to_check.push(pos);
+
+//     while(group_to_check.size() > 0) {
+
+//         unsigned int curr = group_to_check.front();
+//         seen_group.push_back(curr);
+//         group_to_check.pop();
+
+//         std::vector<unsigned int> curr_neighbours = getNeighbourPos(board, curr);
+//         for(auto& n : curr_neighbours){
+//             if(seen.count(n) > 0) continue;
+//             char curr_neighbour = board.get(n);
+//             if(curr_neighbour == 0) return {};
+//             if(curr_neighbour == group_colour) group_to_check.push(n);
+//             seen[n] = true;
+//         }
+
+//     }
+
+//     return false;
+
+// }
+
+// std::string checkForDeadGroups(Board& board) {
+
+// }
 
 #endif 

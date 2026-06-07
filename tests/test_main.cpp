@@ -77,73 +77,172 @@ TEST(getNeighbourPosTest, NonBoundarySingleStone) {
     ASSERT_EQ(a, b);
 }
 
-TEST(isAliveTest, AliveSingleStone) {
-    Board* board = new Board(9);
-    board->set(0, 1);
-    ASSERT_TRUE(isAlive(*board, 0));
+TEST(getGroupTest, BoundarySingleStone) {
+    Board* board;
+    std::vector<unsigned int> got;
+    std::vector<unsigned int> want;
 
-    board = new Board(9);
+    // Corners
+    board = new Board(9); 
     board->set(0, 1);
-    board->set(1, 2);
-    ASSERT_TRUE(isAlive(*board, 0));
+    got = getGroup(*board, 0, 1);
+    want = {0};
+    ASSERT_EQ(got, want);
 
-    board = new Board(9);
-    board->set(3, 1);
-    ASSERT_TRUE(isAlive(*board, 3));
+    board = new Board(9); 
+    board->set(8, 1);
+    got = getGroup(*board, 8, 1);
+    want = {8};
+    ASSERT_EQ(got, want);
+
+    board = new Board(9); 
+    board->set(72, 1);
+    got = getGroup(*board, 72, 1);
+    want = {72};
+    ASSERT_EQ(got, want);
+
+    board = new Board(9); 
+    board->set(80, 1);
+    got = getGroup(*board, 80, 1);
+    want = {80};
+    ASSERT_EQ(got, want);
+
+    // Sides
+    board = new Board(9); 
+    board->set(4, 1);
+    got = getGroup(*board, 4, 1);
+    want = {4};
+    ASSERT_EQ(got, want);
+
+    board = new Board(9); 
+    board->set(44, 1);
+    got = getGroup(*board, 44, 1);
+    want = {44};
+    ASSERT_EQ(got, want);
+
+    board = new Board(9); 
+    board->set(76, 1);
+    got = getGroup(*board, 76, 1);
+    want = {76};
+    ASSERT_EQ(got, want);
+
+    board = new Board(9); 
+    board->set(36, 1);
+    got = getGroup(*board, 36, 1);
+    want = {36};
+    ASSERT_EQ(got, want);
 }
 
-TEST(isAliveTest, DeadSingleStone) {
-    Board* board = new Board(9);
-    board->set(0, 1);
-    board->set(1, 2);
-    board->set(9, 2);
-    ASSERT_FALSE(isAlive(*board, 0));
+TEST(getGroupTest, SingleStone) {
+    Board* board;
+    std::vector<unsigned int> got;
+    std::vector<unsigned int> want;
 
-    board = new Board(9);
-    board->set(11, 1);
-    board->set(2, 2);
-    board->set(10, 2);
-    board->set(12, 2);
-    board->set(20, 2);
-    ASSERT_FALSE(isAlive(*board, 11));
+    board = new Board(9); 
+    board->set(31, 1);
+    got = getGroup(*board, 31, 1);
+    want = {31};
+    ASSERT_EQ(got, want);
 }
 
-TEST(isAliveTest, AliveGroup) {
-    Board* board = new Board(9);
+TEST(getGroupTest, BoundaryGroup) {
+    Board* board;
+    std::vector<unsigned int> got;
+    std::vector<unsigned int> want;
+
+    board = new Board(9); 
     board->set(0, 1);
     board->set(1, 1);
-    board->set(9, 1); 
-    ASSERT_TRUE(isAlive(*board, 0));
-
-    board = new Board(9);
-    board->set(13, 2);
-    board->set(14, 2);
-    board->set(4, 1);
-    board->set(5, 1);
-    board->set(12, 1);
-    board->set(15, 1);
-    board->set(22, 1);
-    ASSERT_TRUE(isAlive(*board, 13));
+    board->set(9, 1);
+    got = getGroup(*board, 0, 1);
+    want = {0, 1, 9};
+    ASSERT_EQ(got, want);
 }
 
-TEST(isAliveTest, DeadGroup) {
-    Board* board = new Board(9);
-    board->set(0, 1);
-    board->set(1, 1);
-    board->set(9, 1); 
-    board->set(2, 2);
-    board->set(10, 2);
-    board->set(18, 2);
-    ASSERT_FALSE(isAlive(*board, 0));
+TEST(getGroupTest, Group) {
+    Board* board;
+    std::vector<unsigned int> got;
+    std::vector<unsigned int> want;
 
-    board = new Board(9);
-    board->set(13, 2);
-    board->set(14, 2);
-    board->set(4, 1);
-    board->set(5, 1);
-    board->set(12, 1);
-    board->set(15, 1);
+    board = new Board(9); 
     board->set(22, 1);
-    board->set(23, 1);
-    ASSERT_FALSE(isAlive(*board, 13));
+    board->set(31, 1);
+    board->set(40, 1);
+    board->set(30, 1);
+    board->set(32, 1);
+    got = getGroup(*board, 31, 1);
+    want = {22, 30, 31, 32, 40};
+    std::sort(got.begin(), got.end());
+    ASSERT_EQ(got, want);
 }
+
+// TEST(isAliveTest, AliveSingleStone) {
+//     Board* board = new Board(9);
+//     board->set(0, 1);
+//     ASSERT_TRUE(isAlive(*board, 0));
+
+//     board = new Board(9);
+//     board->set(0, 1);
+//     board->set(1, 2);
+//     ASSERT_TRUE(isAlive(*board, 0));
+
+//     board = new Board(9);
+//     board->set(3, 1);
+//     ASSERT_TRUE(isAlive(*board, 3));
+// }
+
+// TEST(isAliveTest, DeadSingleStone) {
+//     Board* board = new Board(9);
+//     board->set(0, 1);
+//     board->set(1, 2);
+//     board->set(9, 2);
+//     ASSERT_FALSE(isAlive(*board, 0));
+
+//     board = new Board(9);
+//     board->set(11, 1);
+//     board->set(2, 2);
+//     board->set(10, 2);
+//     board->set(12, 2);
+//     board->set(20, 2);
+//     ASSERT_FALSE(isAlive(*board, 11));
+// }
+
+// TEST(isAliveTest, AliveGroup) {
+//     Board* board = new Board(9);
+//     board->set(0, 1);
+//     board->set(1, 1);
+//     board->set(9, 1); 
+//     ASSERT_TRUE(isAlive(*board, 0));
+
+//     board = new Board(9);
+//     board->set(13, 2);
+//     board->set(14, 2);
+//     board->set(4, 1);
+//     board->set(5, 1);
+//     board->set(12, 1);
+//     board->set(15, 1);
+//     board->set(22, 1);
+//     ASSERT_TRUE(isAlive(*board, 13));
+// }
+
+// TEST(isAliveTest, DeadGroup) {
+//     Board* board = new Board(9);
+//     board->set(0, 1);
+//     board->set(1, 1);
+//     board->set(9, 1); 
+//     board->set(2, 2);
+//     board->set(10, 2);
+//     board->set(18, 2);
+//     ASSERT_FALSE(isAlive(*board, 0));
+
+//     board = new Board(9);
+//     board->set(13, 2);
+//     board->set(14, 2);
+//     board->set(4, 1);
+//     board->set(5, 1);
+//     board->set(12, 1);
+//     board->set(15, 1);
+//     board->set(22, 1);
+//     board->set(23, 1);
+//     ASSERT_FALSE(isAlive(*board, 13));
+// }
