@@ -21,6 +21,8 @@
     72  73  74  75  76  77  78  79  80
 */
 
+// SET METHOD TEST NEEDED
+
 TEST(getNeighbourTest, OOB) {
     Board* board = new Board(9); 
     std::vector<unsigned int> a = {};
@@ -304,7 +306,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(19, 2); 
 
     got = removeDeadStones(*board, 19, 2);
-    want = "dead 0 1 9 10";
+    want = "ok dead 0 1 9 10";
 
     ASSERT_EQ(got, want);
 
@@ -333,7 +335,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(59, 2); 
 
     got = removeDeadStones(*board, 40, 2);
-    want = "dead 30 31 32 39 41 48 49 50";
+    want = "ok dead 30 31 32 39 41 48 49 50";
 
     ASSERT_EQ(got, want);
 
@@ -362,7 +364,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(59, 2); 
 
     got = removeDeadStones(*board, 40, 2);
-    want = "invalid 40";
+    want = "invalid suicide 40";
 
     ASSERT_EQ(got, want);
 }

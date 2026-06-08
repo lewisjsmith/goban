@@ -10,50 +10,42 @@ int main(int argc, char* argv[]) {
     std::string cmd;
     Board* board = new Board();
 
-    // while(std::getline(std::cin, cmd)) {
+    while(std::getline(std::cin, cmd)) {
 
-    //     std::istringstream iss(cmd);
+        std::istringstream iss(cmd);
+        std::string action;
+        iss >> action;
 
-    //     std::string action;
-    //     iss >> action;
+        if(action == "play"){
+            std::string colour;
+            std::string move;
 
-    //     if(action == "play"){
-    //         std::string colour;
-    //         std::string move;
+            iss >> move >> colour;
 
-    //         iss >> colour >> move;
+            bool stonePlaced = board->set(std::stoi(move), std::stoi(colour)); 
 
-    //         /*
-    //             Possible outcomes:
-    //                 Empty OK -> bool TRUE
-    //                 Empty but no liberties -> remove from board -> separation of set method and remove method.
-    //                 Full space -> bool FALSE
-    //         */
+            if(stonePlaced) {
+                std::cout << removeDeadStones(*board, std::stoi(move), std::stoi(colour)) << std::endl;
+            } else {
+                std::cout << "invalid filled " << std::stoi(move) << std::endl;
+            }
+        }
 
-    //         if(board->set(std::stoi(move), std::stoi(colour))) {
-    //             // How to check consecutive circles of pieces 
-    //             if(isAlive(*board, std::stoi(move))){
-    //                 // append updates to this message such as a delete group nearby 
-    //                 std::cout << "ok" << std::endl;
-    //             } else {
-    //                 // constant expressions for error strings 
-    //                 // this one is for dead stones / suicide stones
-    //                 board->set(std::stoi(move), 0);
-    //                 std::cout << "invalid dead" << std::endl;
-    //             }
-    //         } else {
-    //             std::cout << "invalid filled" << std::endl;
-    //         }
-    //     }
+        if(action == "new") {
+            board = new Board();
+        }
 
-    //     if(action == "new") {
-    //         board = new Board();
-    //     }
+        if(action == "quit") {
+            break;
+        }
 
-    //     if(action == "quit") {
-    //         break;
-    //     }
-    // }
+        // simple board for testing
+        for(int i = 0; i < ((board->width)*(board->width)); i++) {
+            if(i % 9 == 0) std::cout << std::endl;
+            std::cout << int(board->board[i]) << " ";
+        }
+        //
+    }
 
     return 0;
 }

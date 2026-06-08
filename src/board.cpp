@@ -14,15 +14,16 @@ Board::Board(unsigned int sz) : width(sz) {
 
 bool Board::set(unsigned int pos, const char c) {
     char pos_val = get(pos);
-    if(pos_val == 0){ 
+    if(pos_val == 0 && (c == 1 || c == 2)){ 
         board[pos] = c;
         return true;
     }
-    else if(c == 0 && (pos_val == 1 || pos_val == 2)){
+    else if((pos_val == 1 || pos_val == 2) && c == 0) {
         board[pos] = c;
         return true;
+    } else {
+        return false;
     }
-    return false;
 };
 
 char Board::get(unsigned int pos) {

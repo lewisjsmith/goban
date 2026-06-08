@@ -85,20 +85,19 @@ std::vector<unsigned int> getGroupNeighbours(Board& board, std::vector<unsigned 
 // getLibertiesFromNeighbourList
 std::vector<unsigned int> getLiberties(Board& board, std::vector<unsigned int> groupNeighbours) {
     
-    unsigned int emptyStoneCount;
+    unsigned int emptyStoneCount = 0;
 
     std::vector<unsigned int> liberties = {};
     
     for(auto& n : groupNeighbours) {
         if(board.get(n) == 0){
-            emptyStoneCount++;
+            emptyStoneCount += 1;
             liberties.push_back(n);
-        }\
+        }
     }
 
     if(emptyStoneCount == 0) return {};
     return liberties;
-
 }
 
 std::vector<unsigned int> getOppositeColourNeighbours(Board& board, std::vector<unsigned int> groupNeighbours) {
@@ -122,11 +121,11 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
     std::vector<unsigned int> group = getGroup(board, latestPos, latestColour);
     std::vector<unsigned int> groupNeighbours = getGroupNeighbours(board, group, latestColour);
     std::vector<unsigned int> oppositeColourNeighbours = getOppositeColourNeighbours(board, groupNeighbours);
-    std::vector<unsigned int> liberties = getLiberties(board, group);
-    if(oppositeColourNeighbours.empty()) return result.str();
+    std::vector<unsigned int> liberties = getLiberties(board, groupNeighbours);
+
+    if(oppositeColourNeighbours.empty()) return std::string("ok") + " " + result.str();
     
     char oppositeColour = board.get(oppositeColourNeighbours[0]);
-
     bool groupDeleted = false;
 
     for(auto& n : oppositeColourNeighbours) {
@@ -146,13 +145,14 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
         }
     }
 
-    if (!groupDeleted) {
-        result << "invalid";
+    if (!groupDeleted && liberties.empty()) {
+        result << "invalid suicide";
         result << " " << latestPos;
         board.set(latestPos, 0);
+        return result.str();
     }
 
-    return result.str();
+    return std::string("ok") + " " + result.str();
 }
 
 // get liberties func ? 
