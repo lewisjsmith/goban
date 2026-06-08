@@ -10,9 +10,6 @@
 #include <string>
 #include <algorithm>
 
-// debug
-#include <iostream>
-
 // getPositionsAroundStone
 std::vector<unsigned int> getNeighbours(Board& board, unsigned int pos) {
     
@@ -70,26 +67,19 @@ std::vector<unsigned int> getGroup(Board& board, unsigned int pos, char colour) 
 
 // getGroupNeighboursGivenGroup
 std::vector<unsigned int> getGroupNeighbours(Board& board, std::vector<unsigned int> group, char colour) {
-    std::vector<unsigned int> liberties = {};
+    std::vector<unsigned int> groupNeighbours = {};
     std::unordered_map<unsigned int, bool> seen = {};
 
     for(auto& s : group){
         std::vector<unsigned int> neighbours = getNeighbours(board, s);
-
-        std::cout << "neighbours: ";
-        for(auto& n : neighbours) {
-            std::cout << int(n) << " ";
-        }
-        std::cout << "end of neighbours" << std::endl;
-
         for(auto& n : neighbours){
             if(seen.count(n) != 0) continue;
-            if(board.get(n) != colour) liberties.push_back(n);
+            if(board.get(n) != colour) groupNeighbours.push_back(n);
             seen[n] = true;
         }
     }
 
-    return liberties;
+    return groupNeighbours;
 }
 
 // getLibertiesFromNeighbourList
@@ -145,20 +135,7 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
         std::vector<unsigned int> oppositeGroupNeighbours = getGroupNeighbours(board, oppositeGroup, oppositeColour);
         std::vector<unsigned int> oppositeGroupLiberties = getLiberties(board, oppositeGroupNeighbours);
 
-        // for(auto& l : oppositeGroupLiberties) {
-        //     std::cout << l << " ";
-        // }
-        // std::cout << std::endl;
-
         if(oppositeGroupLiberties.empty()) {
-
-            // Debug
-            for(auto& l : oppositeGroupNeighbours) {
-                std::cout << l << " ";
-            }
-            std::cout << std::endl;
-            // 
-
             result << "dead";
             std::sort(oppositeGroup.begin(), oppositeGroup.end());
             for(auto& stone : oppositeGroup) {
