@@ -66,6 +66,8 @@ def paintStones(window, state):
     board_x = width / 4
     board_y = (height - width / 2) / 2
 
+    boarder_thickness = 2
+
     for i in range(size):
         for j in range(size):
             if state[i*9 + j] == 1:
@@ -78,9 +80,15 @@ def paintStones(window, state):
             if state[i*9 + j] == 2:
                 pygame.draw.circle(
                     window, 
-                    (255, 255, 255), 
+                    (72, 72, 72), 
                     ((board_x + j * square_width), (board_y + i * square_width)), 
                     square_width/2
+                )
+                pygame.draw.circle(
+                    window, 
+                    (255, 255, 255), 
+                    ((board_x + j * square_width), (board_y + i * square_width)), 
+                    square_width/2 - boarder_thickness
                 )
 
 def posToStone(window, state, pos) -> (int, int):
@@ -96,7 +104,7 @@ def posToStone(window, state, pos) -> (int, int):
     else:
         return zeroes_pos_rounded
 
-def paintHover(window, state):
+def paintHover(window, state, blackStoneTurn):
     width, height = window.get_size()
     square_width = (1/(size-1))*(width/2)
 
@@ -104,9 +112,11 @@ def paintHover(window, state):
     if pos[0] == None or pos[1] == None: 
         return
 
+    colour = (0, 0, 0) if blackStoneTurn else (255, 255, 255)
+
     pygame.draw.circle(
                     window, 
-                    (0, 0, 0), 
+                    colour, 
                     (pos[0] + width/4, pos[1] + (height - width/2)/2), 
                     square_width/2,
                     4
@@ -119,6 +129,7 @@ def main():
     window = pygame.display.set_mode((window_width, window_height))
     clock = pygame.time.Clock()
     running = True
+    blackStoneTurn = True
     
     while running:
 
@@ -126,7 +137,11 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = posToStone(window, state, pygame.mouse.get_pos())
                 if pos[0] != None and pos[1] != None:
-                    state[int(pos[0]/80 + pos[1]*9/80)] = 1
+                    if blackStoneTurn: 
+                        state[int(pos[0]/80 + pos[1]*9/80)] = 1
+                    else:
+                        state[int(pos[0]/80 + pos[1]*9/80)] = 2
+                    blackStoneTurn = not blackStoneTurn
 
             if event.type == pygame.QUIT:
                 running = False
@@ -135,7 +150,7 @@ def main():
         window.fill("white")
         paintBoard(window, size)
         paintStones(window, state)
-        paintHover(window, state)
+        paintHover(window, state, blackStoneTurn)
 
 
         pygame.display.flip()
