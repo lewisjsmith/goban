@@ -12,6 +12,8 @@ import queue
 # proper usage of global variables and passed parameters 
 # currently fails for killing two groups
 # clear engine command needed
+# set engine board size
+# add invalid status for out of bounds
 
 class EngineWrapper:
     def __init__(self):
