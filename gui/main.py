@@ -42,14 +42,34 @@ proc = subprocess.Popen(
 # state[30] = 2
 # state[8] = 1
 
-def paintBoard(window, size):
-    width, height = window.get_size()
-    square_width = (1/(size - 1))*(width/2)
+class Context:
+    window = pygame.display.set_mode((window_width, window_height))
+    boardSize = 9
+    state = []
+    blackStoneTurn = True
+
+    def __init__(self, boardSize):
+        self.boardSize = boardSize
+        for i in range(0, boardSize**2):
+            self.state.append(0)
+
+    def reset(self):
+        self.state = []
+        for i in range(0, self.boardSize**2):
+            self.state.append(0)
+        self.blackStoneTurn = True
+        
+
+def paintBoard(context: Context):
+    width, height = context.window.get_size()
+    boardSize = context.boardSize
+
+    square_width = (1/(boardSize - 1))*(width/2)
     canvas = pygame.Surface((width/2, width/2))
     border = 1
 
-    for i in range(size - 1):
-        for j in range(size - 1):
+    for i in range(boardSize - 1):
+        for j in range(boardSize - 1):
             outer = pygame.Rect(
                 j * square_width,
                 i * square_width,
@@ -67,43 +87,46 @@ def paintBoard(window, size):
             pygame.draw.rect(canvas, (0, 0, 0), outer)
             pygame.draw.rect(canvas, (210, 180, 140), inner)                
 
-        window.blit(canvas, (width/4, (height - width/2)/2))
+        context.window.blit(canvas, (width/4, (height - width/2)/2))
 
-def paintStones(window, state):
-    width, height = window.get_size()
-    square_width = (1/(size-1))*(width/2)
+def paintStones(context: Context):
+    width, height = context.window.get_size()
+    boardSize = context.boardSize
+
+    square_width = (1/(boardSize-1))*(width/2)
 
     board_x = width / 4
     board_y = (height - width / 2) / 2
 
     boarder_thickness = 2
 
-    for i in range(size):
-        for j in range(size):
-            if state[i*size + j] == 1:
+    for i in range(boardSize):
+        for j in range(boardSize):
+            if context.state[i*boardSize + j] == 1:
                 pygame.draw.circle(
-                    window, 
+                    context.window, 
                     (0, 0, 0), 
                     ((board_x + j * square_width), (board_y + i * square_width)), 
                     square_width/2
                 )
-            if state[i*size + j] == 2:
+            if context.state[i*boardSize + j] == 2:
                 pygame.draw.circle(
-                    window, 
+                    context.window, 
                     (72, 72, 72), 
                     ((board_x + j * square_width), (board_y + i * square_width)), 
                     square_width/2
                 )
                 pygame.draw.circle(
-                    window, 
+                    context.window, 
                     (255, 255, 255), 
                     ((board_x + j * square_width), (board_y + i * square_width)), 
                     square_width/2 - boarder_thickness
                 )
 
-def posToStone(window, state, pos) -> (int, int):
-    width, height = window.get_size()
-    square_width = (1/(size-1))*(width/2)
+def posToStone(context: Context, pos) -> (int, int):
+    width, height = context.window.get_size()
+    boardSize = context.boardSize
+    square_width = (1/(boardSize-1))*(width/2)
 
     zero = (width/4, (height - width/2)/2)
     zeroed_pos = (pos[0] - zero[0], pos[1] - zero[1])
@@ -114,52 +137,49 @@ def posToStone(window, state, pos) -> (int, int):
     else:
         return zeroes_pos_rounded
 
-def paintHover(window, state, blackStoneTurn):
-    width, height = window.get_size()
-    square_width = (1/(size-1))*(width/2)
+def paintHover(context: Context):
+    width, height = context.window.get_size()
+    boardSize = context.boardSize
+    square_width = (1/(boardSize-1))*(width/2)
 
-    pos = posToStone(window, state, pygame.mouse.get_pos())
+    pos = posToStone(context, pygame.mouse.get_pos())
     if pos[0] == None or pos[1] == None: 
         return
 
-    colour = (0, 0, 0) if blackStoneTurn else (255, 255, 255)
+    colour = (0, 0, 0) if context.blackStoneTurn else (255, 255, 255)
 
     pygame.draw.circle(
-                    window, 
+                    context.window, 
                     colour, 
                     (pos[0] + width/4, pos[1] + (height - width/2)/2), 
                     square_width/2,
                     4
-                )
+                )    
 
 def main():
     # pygame setup
     pygame.init()
     threading.Thread(target=reader, args=(proc,), daemon=True).start()
-    state = []
-    for i in range(0, size*size):
-        state.append(0)
+    context = Context(9)
 
-    window = pygame.display.set_mode((window_width, window_height))
     clock = pygame.time.Clock()
     running = True
-    blackStoneTurn = True
     
     while running:
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = posToStone(window, state, pygame.mouse.get_pos())
+                pos = posToStone(context, pygame.mouse.get_pos())
                 if pos[0] is not None:
 
-                    square_width = (1/(size-1))*(window.get_width()/2)
+                    square_width = (1/(size-1))*(context.window.get_width()/2)
 
                     col = round(pos[0] / square_width)
                     row = round(pos[1] / square_width)
 
                     index = row * size + col
 
-                    if blackStoneTurn:
+                    if context.blackStoneTurn:
                         proc.stdin.write(f"play {index} 1\n")
                         proc.stdin.flush()
                         
@@ -169,12 +189,9 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
-                    state = []
-                    for i in range(0, size*size):
-                        state.append(0)
                     proc.stdin.write(f"reset\n")
                     proc.stdin.flush()
-                    blackStoneTurn = True
+                    context.reset()
 
             if event.type == pygame.QUIT:
                 running = False
@@ -185,21 +202,21 @@ def main():
             if words:
                 print(words)
                 if words[0] == "ok":
-                    state[int(words[1])] = int(words[2])
-                    blackStoneTurn = not blackStoneTurn
+                    context.state[int(words[1])] = int(words[2])
+                    context.blackStoneTurn = not context.blackStoneTurn
 
                     if len(words) > 3 and words[3] == "dead":
                         for i in range(4, len(words)):
-                            state[int(words[i])] = 0
+                            context.state[int(words[i])] = 0
 
                 if words[0] == "invalid":
                     print("ERROR: position already filled.")
         
         # Painting
-        window.fill("white")
-        paintBoard(window, size)
-        paintStones(window, state)
-        paintHover(window, state, blackStoneTurn)
+        context.window.fill("white")
+        paintBoard(context)
+        paintStones(context)
+        paintHover(context)
 
 
         pygame.display.flip()
