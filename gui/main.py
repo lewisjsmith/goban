@@ -54,13 +54,16 @@ class Context:
         self.boardSize = boardSize
         self.state = [0] * (boardSize ** 2)
         self.blackStoneTurn = True
-        self.canvas = pygame.Surface((width/2, width/2))
+        self.canvas = self._generateBoardSurface(width)
+                
+    def _generateBoardSurface(self, width):
+        surface = pygame.Surface((width/2, width/2))
 
-        square_width = (1/(boardSize - 1))*(width/2)
+        square_width = (1/(self.boardSize - 1))*(width/2)
         border = 1
 
-        for i in range(boardSize - 1):
-            for j in range(boardSize - 1):
+        for i in range(self.boardSize - 1):
+            for j in range(self.boardSize - 1):
                 outer = pygame.Rect(
                     j * square_width,
                     i * square_width,
@@ -75,8 +78,10 @@ class Context:
                     square_width - 2 * border
                 )
 
-                pygame.draw.rect(self.canvas, (0, 0, 0), outer)
-                pygame.draw.rect(self.canvas, (210, 180, 140), inner)  
+                pygame.draw.rect(surface, (0, 0, 0), outer)
+                pygame.draw.rect(surface, (210, 180, 140), inner)  
+
+        return surface
 
     def reset(self):
         self.state = [0] * (self.boardSize ** 2)
@@ -120,7 +125,7 @@ def paintStones(context: Context):
                     square_width/2 - boarder_thickness
                 )
 
-def posToStone(context: Context, pos) -> (int, int):
+def posToStone(context: Context, pos: (int, int)) -> (int, int):
     width, height = context.window.get_size()
     boardSize = context.boardSize
     square_width = (1/(boardSize-1))*(width/2)
