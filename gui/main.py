@@ -3,20 +3,30 @@ import pygame
 from pathlib import Path
 import subprocess
 
+import threading
+import queue
+
+engine_messages = queue.Queue()
+
+def reader(proc):
+    while True:
+        line = proc.stdout.readline()
+        if not line:
+            break
+        engine_messages.put(line.strip())
+
 # TODO: 
 # settings data file 
 # consistent use of "size" throughout range iterators
 # subprocess and threads for non-blocking engine usage
 # separation of functions into modules
 # proper usage of global variables and passed parameters 
+# currently fails for killing two groups
+# clear engine command needed
 
 window_width = 1280
 window_height = 720
-size = 13
-
-state = []
-for i in range(0, size*size):
-    state.append(0)
+size = 9
 
 engine_path = Path(__file__).parent.parent / "engine" / "build" / "prog"
 proc = subprocess.Popen(
@@ -125,6 +135,10 @@ def paintHover(window, state, blackStoneTurn):
 def main():
     # pygame setup
     pygame.init()
+    threading.Thread(target=reader, args=(proc,), daemon=True).start()
+    state = []
+    for i in range(0, size*size):
+        state.append(0)
 
     window = pygame.display.set_mode((window_width, window_height))
     clock = pygame.time.Clock()
@@ -137,6 +151,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = posToStone(window, state, pygame.mouse.get_pos())
                 if pos[0] is not None:
+
                     square_width = (1/(size-1))*(window.get_width()/2)
 
                     col = round(pos[0] / square_width)
@@ -145,14 +160,40 @@ def main():
                     index = row * size + col
 
                     if blackStoneTurn:
-                        state[index] = 1
+                        proc.stdin.write(f"play {index} 1\n")
+                        proc.stdin.flush()
+                        
                     else:
-                        state[index] = 2
+                        proc.stdin.write(f"play {index} 2\n")
+                        proc.stdin.flush()
 
-                    blackStoneTurn = not blackStoneTurn
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    state = []
+                    for i in range(0, size*size):
+                        state.append(0)
+                    proc.stdin.write(f"reset\n")
+                    proc.stdin.flush()
+                    blackStoneTurn = True
 
             if event.type == pygame.QUIT:
                 running = False
+        
+        while not engine_messages.empty():
+            line = engine_messages.get()
+            words = line.split()
+            if words:
+                print(words)
+                if words[0] == "ok":
+                    state[int(words[1])] = int(words[2])
+                    blackStoneTurn = not blackStoneTurn
+
+                    if len(words) > 3 and words[3] == "dead":
+                        for i in range(4, len(words)):
+                            state[int(words[i])] = 0
+
+                if words[0] == "invalid":
+                    print("ERROR: position already filled.")
         
         # Painting
         window.fill("white")
