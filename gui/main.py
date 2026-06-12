@@ -12,10 +12,10 @@ import subprocess
 
 window_width = 1280
 window_height = 720
-size = 9
+size = 13
 
 state = []
-for i in range(0, 81):
+for i in range(0, size*size):
     state.append(0)
 
 engine_path = Path(__file__).parent.parent / "engine" / "build" / "prog"
@@ -36,7 +36,7 @@ def paintBoard(window, size):
     width, height = window.get_size()
     square_width = (1/(size - 1))*(width/2)
     canvas = pygame.Surface((width/2, width/2))
-    border = 2
+    border = 1
 
     for i in range(size - 1):
         for j in range(size - 1):
@@ -70,14 +70,14 @@ def paintStones(window, state):
 
     for i in range(size):
         for j in range(size):
-            if state[i*9 + j] == 1:
+            if state[i*size + j] == 1:
                 pygame.draw.circle(
                     window, 
                     (0, 0, 0), 
                     ((board_x + j * square_width), (board_y + i * square_width)), 
                     square_width/2
                 )
-            if state[i*9 + j] == 2:
+            if state[i*size + j] == 2:
                 pygame.draw.circle(
                     window, 
                     (72, 72, 72), 
@@ -136,11 +136,19 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = posToStone(window, state, pygame.mouse.get_pos())
-                if pos[0] != None and pos[1] != None:
-                    if blackStoneTurn: 
-                        state[int(pos[0]/80 + pos[1]*9/80)] = 1
+                if pos[0] is not None:
+                    square_width = (1/(size-1))*(window.get_width()/2)
+
+                    col = round(pos[0] / square_width)
+                    row = round(pos[1] / square_width)
+
+                    index = row * size + col
+
+                    if blackStoneTurn:
+                        state[index] = 1
                     else:
-                        state[int(pos[0]/80 + pos[1]*9/80)] = 2
+                        state[index] = 2
+
                     blackStoneTurn = not blackStoneTurn
 
             if event.type == pygame.QUIT:
