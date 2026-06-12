@@ -6,15 +6,6 @@ import subprocess
 import threading
 import queue
 
-engine_messages = queue.Queue()
-
-def reader(proc):
-    while True:
-        line = proc.stdout.readline()
-        if not line:
-            break
-        engine_messages.put(line.strip())
-
 # TODO: 
 # settings data file 
 # consistent use of "size" throughout range iterators
@@ -24,54 +15,76 @@ def reader(proc):
 # currently fails for killing two groups
 # clear engine command needed
 
-engine_path = Path(__file__).parent.parent / "engine" / "build" / "prog"
-proc = subprocess.Popen(
-    [str(engine_path)],  
-    stdin=subprocess.PIPE,
-    stdout=subprocess.PIPE,
-    text=True,
-    bufsize=1  
-)
+import threading
+import subprocess
+import queue
+from pathlib import Path
+
+class EngineWrapper:
+    def __init__(self):
+        self.engine_path = Path(__file__).parent.parent / "engine" / "build" / "prog"
+        self.proc = subprocess.Popen(
+            [str(self.engine_path)],  
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+            bufsize=1
+        )
+        self.engine_messages = queue.Queue()
+        threading.Thread(target=self.reader, daemon=True).start()
+    
+    def reader(self):
+        while True:
+            line = self.proc.stdout.readline()
+            if not line:
+                break
+            self.engine_messages.put(line.strip())
+
+    def send_command(self, command: str):
+        self.proc.stdin.write(f"{command}\n")
+        self.proc.stdin.flush()
+
+    def terminate(self):
+        self.send_command("quit")
+        self.proc.wait()
 
 class Context:
-    def __init__(self, boardSize, width=1280, height=720):
+    def __init__(self, boardSize=9, width=1280, height=720):
         self.window = pygame.display.set_mode((width, height))
         self.boardSize = boardSize
-        self.state = [0] * (boardSize ** 2) # Pythonic way to initialize the list
+        self.state = [0] * (boardSize ** 2)
         self.blackStoneTurn = True
+        self.canvas = pygame.Surface((width/2, width/2))
+
+        square_width = (1/(boardSize - 1))*(width/2)
+        border = 1
+
+        for i in range(boardSize - 1):
+            for j in range(boardSize - 1):
+                outer = pygame.Rect(
+                    j * square_width,
+                    i * square_width,
+                    square_width,
+                    square_width
+                )
+
+                inner = pygame.Rect(
+                    j * square_width + border,
+                    i * square_width + border,
+                    square_width - 2 * border,
+                    square_width - 2 * border
+                )
+
+                pygame.draw.rect(self.canvas, (0, 0, 0), outer)
+                pygame.draw.rect(self.canvas, (210, 180, 140), inner)  
 
     def reset(self):
         self.state = [0] * (self.boardSize ** 2)
         self.blackStoneTurn = True
         
 def paintBoard(context: Context):
-    width, height = context.window.get_size()
-    boardSize = context.boardSize
-
-    square_width = (1/(boardSize - 1))*(width/2)
-    canvas = pygame.Surface((width/2, width/2))
-    border = 1
-
-    for i in range(boardSize - 1):
-        for j in range(boardSize - 1):
-            outer = pygame.Rect(
-                j * square_width,
-                i * square_width,
-                square_width,
-                square_width
-            )
-
-            inner = pygame.Rect(
-                j * square_width + border,
-                i * square_width + border,
-                square_width - 2 * border,
-                square_width - 2 * border
-            )
-
-            pygame.draw.rect(canvas, (0, 0, 0), outer)
-            pygame.draw.rect(canvas, (210, 180, 140), inner)                
-
-        context.window.blit(canvas, (width/4, (height - width/2)/2))
+    width, height = context.window.get_size()          
+    context.window.blit(context.canvas, (width/4, (height - width/2)/2))
 
 def paintStones(context: Context):
     width, height = context.window.get_size()
@@ -140,7 +153,7 @@ def paintHover(context: Context):
                     4
                 )    
 
-def eventHandler(context: Context, proc):
+def eventHandler(context: Context, engine: EngineWrapper):
     for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = posToStone(context, pygame.mouse.get_pos())
@@ -154,18 +167,15 @@ def eventHandler(context: Context, proc):
                         index = row * context.boardSize + col
 
                         if context.blackStoneTurn:
-                            proc.stdin.write(f"play {index} 1\n")
-                            proc.stdin.flush()
+                            engine.send_command(f"play {index} 1")
                             
                         else:
-                            proc.stdin.write(f"play {index} 2\n")
-                            proc.stdin.flush()
+                            engine.send_command(f"play {index} 2")
 
                 if event.type == pygame.KEYDOWN:
 
                     if event.key == pygame.K_r:
-                        proc.stdin.write(f"reset\n")
-                        proc.stdin.flush()
+                        engine.send_command(f"reset")
                         context.reset()
 
                     if event.key == pygame.K_q:
@@ -177,9 +187,9 @@ def eventHandler(context: Context, proc):
      
     return True
 
-def engineHandler(context: Context, engine_messages):
-    while not engine_messages.empty():
-        line = engine_messages.get()
+def engineHandler(context: Context, engine: EngineWrapper):
+    while not engine.engine_messages.empty():
+        line = engine.engine_messages.get()
         words = line.split()
         if words:
             print(words)
@@ -201,10 +211,8 @@ def updateDisplay(context: Context):
     paintHover(context)
     pygame.display.flip()
 
-def cleanUp(proc):
-    proc.stdin.write("quit\n")
-    proc.stdin.flush()
-    proc.wait()
+def cleanUp(engine: EngineWrapper):
+    engine.terminate()
     pygame.quit()
 
 def main():
@@ -212,7 +220,7 @@ def main():
     pygame.init()
 
     # parallel exe thread
-    threading.Thread(target=reader, args=(proc,), daemon=True).start()
+    engine = EngineWrapper()
 
     # game context
     context = Context(9)
@@ -224,10 +232,10 @@ def main():
     while running:
         
         # Events
-        running = eventHandler(context, proc)
+        running = eventHandler(context, engine)
 
         # Engine -> Gui communication
-        engineHandler(context, engine_messages)
+        engineHandler(context, engine)
         
         # Refresh screen
         updateDisplay(context)
@@ -236,7 +244,7 @@ def main():
         clock.tick(60)
 
     # close process
-    cleanUp(proc)
+    cleanUp(engine)
 
 if __name__ == "__main__":
     main()
