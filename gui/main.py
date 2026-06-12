@@ -24,10 +24,6 @@ def reader(proc):
 # currently fails for killing two groups
 # clear engine command needed
 
-window_width = 1280
-window_height = 720
-size = 9
-
 engine_path = Path(__file__).parent.parent / "engine" / "build" / "prog"
 proc = subprocess.Popen(
     [str(engine_path)],  
@@ -37,29 +33,17 @@ proc = subprocess.Popen(
     bufsize=1  
 )
 
-# Test
-# state[10] = 1
-# state[30] = 2
-# state[8] = 1
-
 class Context:
-    window = pygame.display.set_mode((window_width, window_height))
-    boardSize = 9
-    state = []
-    blackStoneTurn = True
-
-    def __init__(self, boardSize):
+    def __init__(self, boardSize, width=1280, height=720):
+        self.window = pygame.display.set_mode((width, height))
         self.boardSize = boardSize
-        for i in range(0, boardSize**2):
-            self.state.append(0)
+        self.state = [0] * (boardSize ** 2) # Pythonic way to initialize the list
+        self.blackStoneTurn = True
 
     def reset(self):
-        self.state = []
-        for i in range(0, self.boardSize**2):
-            self.state.append(0)
+        self.state = [0] * (self.boardSize ** 2)
         self.blackStoneTurn = True
         
-
 def paintBoard(context: Context):
     width, height = context.window.get_size()
     boardSize = context.boardSize
@@ -156,77 +140,103 @@ def paintHover(context: Context):
                     4
                 )    
 
-def main():
-    # pygame setup
-    pygame.init()
-    threading.Thread(target=reader, args=(proc,), daemon=True).start()
-    context = Context(9)
+def eventHandler(context: Context, proc):
+    for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = posToStone(context, pygame.mouse.get_pos())
+                    if pos[0] is not None:
 
-    clock = pygame.time.Clock()
-    running = True
-    
-    while running:
+                        square_width = (1/(context.boardSize - 1))*(context.window.get_width()/2)
 
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = posToStone(context, pygame.mouse.get_pos())
-                if pos[0] is not None:
+                        col = round(pos[0] / square_width)
+                        row = round(pos[1] / square_width)
 
-                    square_width = (1/(size-1))*(context.window.get_width()/2)
+                        index = row * context.boardSize + col
 
-                    col = round(pos[0] / square_width)
-                    row = round(pos[1] / square_width)
+                        if context.blackStoneTurn:
+                            proc.stdin.write(f"play {index} 1\n")
+                            proc.stdin.flush()
+                            
+                        else:
+                            proc.stdin.write(f"play {index} 2\n")
+                            proc.stdin.flush()
 
-                    index = row * size + col
+                if event.type == pygame.KEYDOWN:
 
-                    if context.blackStoneTurn:
-                        proc.stdin.write(f"play {index} 1\n")
+                    if event.key == pygame.K_r:
+                        proc.stdin.write(f"reset\n")
                         proc.stdin.flush()
-                        
-                    else:
-                        proc.stdin.write(f"play {index} 2\n")
-                        proc.stdin.flush()
+                        context.reset()
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    proc.stdin.write(f"reset\n")
-                    proc.stdin.flush()
-                    context.reset()
-
-            if event.type == pygame.QUIT:
-                running = False
-        
-        while not engine_messages.empty():
-            line = engine_messages.get()
-            words = line.split()
-            if words:
-                print(words)
-                if words[0] == "ok":
-                    context.state[int(words[1])] = int(words[2])
-                    context.blackStoneTurn = not context.blackStoneTurn
-
-                    if len(words) > 3 and words[3] == "dead":
-                        for i in range(4, len(words)):
-                            context.state[int(words[i])] = 0
-
-                if words[0] == "invalid":
-                    print("ERROR: position already filled.")
-        
-        # Painting
-        context.window.fill("white")
-        paintBoard(context)
-        paintStones(context)
-        paintHover(context)
+                    if event.key == pygame.K_q:
+                        return False
 
 
-        pygame.display.flip()
-        clock.tick(60)
+                if event.type == pygame.QUIT:
+                    return False
+     
+    return True
 
+def engineHandler(context: Context, engine_messages):
+    while not engine_messages.empty():
+        line = engine_messages.get()
+        words = line.split()
+        if words:
+            print(words)
+            if words[0] == "ok":
+                context.state[int(words[1])] = int(words[2])
+                context.blackStoneTurn = not context.blackStoneTurn
+
+                if len(words) > 3 and words[3] == "dead":
+                    for i in range(4, len(words)):
+                        context.state[int(words[i])] = 0
+
+            if words[0] == "invalid":
+                print("ERROR: position already filled.")
+
+def updateDisplay(context: Context):
+    context.window.fill("white")
+    paintBoard(context)
+    paintStones(context)
+    paintHover(context)
+    pygame.display.flip()
+
+def cleanUp(proc):
     proc.stdin.write("quit\n")
     proc.stdin.flush()
     proc.wait()
     pygame.quit()
 
+def main():
+    # pygame setup
+    pygame.init()
+
+    # parallel exe thread
+    threading.Thread(target=reader, args=(proc,), daemon=True).start()
+
+    # game context
+    context = Context(9)
+
+    # fps
+    clock = pygame.time.Clock()
+
+    running = True    
+    while running:
+        
+        # Events
+        running = eventHandler(context, proc)
+
+        # Engine -> Gui communication
+        engineHandler(context, engine_messages)
+        
+        # Refresh screen
+        updateDisplay(context)
+        
+        # tick
+        clock.tick(60)
+
+    # close process
+    cleanUp(proc)
 
 if __name__ == "__main__":
     main()
