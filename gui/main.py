@@ -1,8 +1,6 @@
 import pygame
-
 from pathlib import Path
 import subprocess
-
 import threading
 import queue
 
@@ -14,11 +12,6 @@ import queue
 # proper usage of global variables and passed parameters 
 # currently fails for killing two groups
 # clear engine command needed
-
-import threading
-import subprocess
-import queue
-from pathlib import Path
 
 class EngineWrapper:
     def __init__(self):
