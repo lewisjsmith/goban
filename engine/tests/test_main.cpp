@@ -306,7 +306,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(19, 2); 
 
     got = removeDeadStones(*board, 19, 2);
-    want = "ok dead 0 1 9 10";
+    want = "ok 19 2 dead 0 1 9 10";
 
     ASSERT_EQ(got, want);
 
@@ -335,7 +335,24 @@ TEST(removeDeadStonesTest, Group) {
     board->set(59, 2); 
 
     got = removeDeadStones(*board, 40, 2);
-    want = "ok dead 30 31 32 39 41 48 49 50";
+    want = "ok 40 2 dead 30 31 32 39 41 48 49 50";
+
+    ASSERT_EQ(got, want);
+
+    board = new Board(9);
+    board->set(20, 1);
+    board->set(28, 1);
+    board->set(38, 1);
+    board->set(30, 1);
+    board->set(22, 1);
+    board->set(32, 1);
+    board->set(40, 1);
+
+    board->set(29, 2);
+    board->set(31, 2);
+
+    got = removeDeadStones(*board, 30 , 1);
+    want = "ok 30 1 dead 29 31";
 
     ASSERT_EQ(got, want);
 
@@ -364,7 +381,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(59, 2); 
 
     got = removeDeadStones(*board, 40, 2);
-    want = "invalid suicide 40";
+    want = "invalid suicide 40 2";
 
     ASSERT_EQ(got, want);
 }

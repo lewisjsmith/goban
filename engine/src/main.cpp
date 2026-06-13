@@ -31,8 +31,37 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if(action == "new") {
+        if(action == "reset") {
             board = new Board();
+        }
+
+        if(action == "resize") {
+            std::string newSize;
+            iss >> newSize;
+
+            unsigned int newSizeInt = std::stoi(newSize);
+
+            if(newSizeInt == 9 || newSizeInt == 13 || newSizeInt == 19) {
+                board = new Board(std::stoi(newSize));    
+                std::cout << "ok resize " << newSize << std::endl;
+            } else {
+                std::cout << "invalid resize " << newSize << std::endl;
+            }
+            
+        }
+
+        if(action == "print") {
+            
+            std::ostringstream boardDebug;
+
+            for(int i = 0; i < board->board.size(); i++) {
+                boardDebug << (int)board->board[i] << " ";
+                if((i+1)%board->width == 0) {
+                   boardDebug << "\n";
+                }
+            }
+
+            std::cout << boardDebug.str() << std::endl;
         }
 
         if(action == "quit") {
@@ -40,10 +69,10 @@ int main(int argc, char* argv[]) {
         }
 
         // simple board for testing
-        for(int i = 0; i < ((board->width)*(board->width)); i++) {
-            if(i % 9 == 0) std::cout << std::endl;
-            std::cout << int(board->board[i]) << " ";
-        }
+        // for(int i = 0; i < ((board->width)*(board->width)); i++) {
+        //     if(i % 9 == 0) std::cout << std::endl;
+        //     std::cout << int(board->board[i]) << " ";
+        // }
         //
     }
 

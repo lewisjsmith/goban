@@ -123,7 +123,7 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
     std::vector<unsigned int> oppositeColourNeighbours = getOppositeColourNeighbours(board, groupNeighbours);
     std::vector<unsigned int> liberties = getLiberties(board, groupNeighbours);
 
-    if(oppositeColourNeighbours.empty()) return std::string("ok") + " " + result.str();
+    if(oppositeColourNeighbours.empty()) return std::string("ok") + " " + std::to_string(latestPos) + " " + std::string(1, '0' + latestColour);
     
     char oppositeColour = board.get(oppositeColourNeighbours[0]);
     bool groupDeleted = false;
@@ -135,7 +135,11 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
         std::vector<unsigned int> oppositeGroupLiberties = getLiberties(board, oppositeGroupNeighbours);
 
         if(oppositeGroupLiberties.empty()) {
-            result << "dead";
+
+            if (std::string multiGroup = result.str(); multiGroup.find("dead") == std::string::npos){
+                result << "dead";
+            }
+            
             std::sort(oppositeGroup.begin(), oppositeGroup.end());
             for(auto& stone : oppositeGroup) {
                 result << " " << int(stone);
@@ -147,12 +151,12 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
 
     if (!groupDeleted && liberties.empty()) {
         result << "invalid suicide";
-        result << " " << latestPos;
+        result << " " << latestPos << " " << std::string(1, '0' + latestColour);
         board.set(latestPos, 0);
         return result.str();
     }
 
-    return std::string("ok") + " " + result.str();
+    return std::string("ok") + " " + std::to_string(latestPos) + " " + std::string(1, '0' + latestColour) + " " + result.str();
 }
 
 // get liberties func ? 
