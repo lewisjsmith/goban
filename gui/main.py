@@ -6,13 +6,6 @@ import queue
 
 # TODO: 
 # settings data file 
-# consistent use of "size" throughout range iterators
-# subprocess and threads for non-blocking engine usage
-# separation of functions into modules
-# proper usage of global variables and passed parameters 
-# currently fails for killing two groups
-# clear engine command needed
-# set engine board size
 # add invalid status for out of bounds
 
 class EngineWrapper:
@@ -194,12 +187,19 @@ def engineHandler(context: Context, engine: EngineWrapper):
         if words:
             print(words)
             if words[0] == "ok":
-                context.state[int(words[1])] = int(words[2])
-                context.blackStoneTurn = not context.blackStoneTurn
 
-                if len(words) > 3 and words[3] == "dead":
-                    for i in range(4, len(words)):
-                        context.state[int(words[i])] = 0
+                if words[1] == "resize":
+                    context.boardSize = int(words[2])
+                    context.reset()
+
+                # piece placement
+                else:
+                    context.state[int(words[1])] = int(words[2])
+                    context.blackStoneTurn = not context.blackStoneTurn
+
+                    if len(words) > 3 and words[3] == "dead":
+                        for i in range(4, len(words)):
+                            context.state[int(words[i])] = 0
 
             if words[0] == "invalid":
                 print("ERROR: position already filled.")
@@ -222,8 +222,14 @@ def main():
     # parallel exe thread
     engine = EngineWrapper()
 
-    # game context
+    # game context - currently have to set Context() and send the command to resize
     context = Context(9)
+
+    # context = Context(13)
+    # engine.send_command(f"resize 13")
+
+    # context = Context(19)
+    # engine.send_command(f"resize 19")
 
     # fps
     clock = pygame.time.Clock()
