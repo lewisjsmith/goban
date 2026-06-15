@@ -6,6 +6,7 @@ import cv2
 import time
 
 import threading
+import queue
 
 load_dotenv()
 hostname = os.getenv("HOSTNAME")
@@ -24,7 +25,6 @@ required = [
 if not all(required):
     raise ValueError("Missing required environment variables")
 
-
 # Start streaming from rpicam 
 cmd = f'rpicam-vid -t 0 --width 640 --height 480 --inline --framerate 10 -o - | ffmpeg -f h264 -re -i - -f mpegts {streamAddress}'
 
@@ -32,13 +32,14 @@ cmd = f'rpicam-vid -t 0 --width 640 --height 480 --inline --framerate 10 -o - | 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-action = ""
+input_queue = queue.Queue()
 
 # Thread to register input, needs to loop or will just run once
 def user_input():
-    global action
     while True:
-        action = input("> ")
+        # strip removes whitespaces
+        user_in = input("> ").strip().lower()
+        input_queue.put(user_in)
 
 # Create the thread and then start it
 thread = threading.Thread(target=user_input, daemon=True)
@@ -65,10 +66,16 @@ try:
     if not cam.isOpened():
         raise RuntimeError("Failed to open video stream")
 
+    action = None
+
     # If successful
     while True:
-        if(action == "quit"):
-            break
+        try:
+            action = input_queue.get_nowait()
+            if action == "quit":
+                break
+        except queue.Empty:
+            pass
 
         # Read frame
         ret, frame = cam.read()
@@ -77,18 +84,29 @@ try:
             if(action == "capture"):
                 # Save photo
                 timestr = time.strftime("%Y%m%d-%H%M%S")
-                cv2.imwrite(f'board_{timestr}.jpg', frame)
-                action = ""
+                filename = f'board_{timestr}.jpg'
+                cv2.imwrite(filename, frame)
+                print(f"Captured: {filename}")
+
+                action = None
 
             # Update video stream
             cv2.imshow("test_cam", frame)
-            cv2.waitKey(1)
+
+        cv2.waitKey(1)
 
 # Clean-up
 finally:
     if cam is not None:
         cam.release()
     cv2.destroyAllWindows()
+    try:
+        stdin.close()
+        stdout.close()
+        stderr.close()
+    except:
+        pass
     ssh.close()
+    print("Done.")
 
 # vlc udp://@:port :demux=h264
