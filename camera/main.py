@@ -5,8 +5,8 @@ import paramiko
 import cv2
 import time
 
-import threading
-import queue
+# import threading
+# import queue
 
 load_dotenv()
 hostname = os.getenv("HOSTNAME")
@@ -32,18 +32,18 @@ cmd = f'rpicam-vid -t 0 --width 640 --height 480 --inline --framerate 10 -o - | 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-input_queue = queue.Queue()
+# input_queue = queue.Queue()
 
 # Thread to register input, needs to loop or will just run once
-def user_input():
-    while True:
-        # strip removes whitespaces
-        user_in = input("> ").strip().lower()
-        input_queue.put(user_in)
+# def user_input():
+#     while True:
+#         # strip removes whitespaces
+#         user_in = input("> ").strip().lower()
+#         input_queue.put(user_in)
 
 # Create the thread and then start it
-thread = threading.Thread(target=user_input, daemon=True)
-thread.start()
+# thread = threading.Thread(target=user_input, daemon=True)
+# thread.start()
 
 cam = None
 
@@ -58,6 +58,7 @@ try:
         allow_agent=False
     )
 
+    # stdin.read() is blocking and isn't checked in this instance
     stdin, stdout, stderr = ssh.exec_command(cmd)
 
     # Start receiving udp stream 
@@ -66,34 +67,58 @@ try:
     if not cam.isOpened():
         raise RuntimeError("Failed to open video stream")
 
-    action = None
+    # action = None
 
-    # If successful
+    # # If successful
+    # while True:
+    #     try:
+    #         action = input_queue.get_nowait()
+    #         if action == "quit":
+    #             break
+    #     except queue.Empty:
+    #         pass
+
+    #     # Read frame
+    #     ret, frame = cam.read()
+
+    #     if ret:
+    #         if(action == "capture"):
+    #             # Save photo
+    #             timestr = time.strftime("%Y%m%d-%H%M%S")
+    #             filename = f'board_{timestr}.jpg'
+    #             cv2.imwrite(filename, frame)
+    #             print(f"Captured: {filename}")
+
+    #             action = None
+
+    #         # Update video stream
+    #         cv2.imshow("test_cam", frame)
+
+    #     cv2.waitKey(1)
+
     while True:
-        try:
-            action = input_queue.get_nowait()
-            if action == "quit":
-                break
-        except queue.Empty:
-            pass
-
-        # Read frame
         ret, frame = cam.read()
 
-        if ret:
-            if(action == "capture"):
-                # Save photo
-                timestr = time.strftime("%Y%m%d-%H%M%S")
-                filename = f'board_{timestr}.jpg'
-                cv2.imwrite(filename, frame)
-                print(f"Captured: {filename}")
+        if not ret:
+            print("Failed to read frame")
+            # stops CPU spinning at max
+            time.sleep(0.1)
+            continue
 
-                action = None
+        cv2.imshow("test_cam", frame)
 
-            # Update video stream
-            cv2.imshow("test_cam", frame)
+        # this bitwise operator "&" applies the 0xFF mask to keep the lowest 8 digits (one hex being 4 digits 0-15)
+        # 0xFF == 0x000000FF
+        key = cv2.waitKey(1) & 0xFF
 
-        cv2.waitKey(1)
+        if key == ord(' '):
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            filename = f"board_{timestr}.jpg"
+            cv2.imwrite(filename, frame)
+            print(f"Captured: {filename}")
+
+        elif key == ord('q'):
+            break
 
 # Clean-up
 finally:
