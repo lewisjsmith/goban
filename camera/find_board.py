@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+from math import atan2
+
 original_img = cv2.imread("training/board_20260618-121132.jpg")
 
 # Write permissions
@@ -18,6 +20,8 @@ def map_blur_kernel_size(pos):
 cv2.createTrackbar('dp_epsilon', 'img', 0, 100, lambda x: None)
 def map_dp_epsilon(pos, perimeter):
     return (pos / 1000)*perimeter
+
+board_points = None
 
 while True:
     img_copy = img.copy()
@@ -52,3 +56,28 @@ while True:
     if k == 27:
         cv2.destroyAllWindows()
         break
+
+    if k == 115 and len(simple_polygon) == 4:
+        cv2.destroyAllWindows()
+        board_points = simple_polygon
+        cv2.destroyAllWindows()
+        break
+
+board_points = board_points.squeeze()
+
+def order_points(points):
+    top_left = min(points, key=lambda p: p[0] + p[1])
+    bottom_right = max(points, key=lambda p: p[0] + p[1])
+    top_right = min(points, key=lambda p: p[0] - p[1])
+    bottom_left = max(points, key=lambda p: p[0] - p[1])
+
+    return [top_left, top_right, bottom_right, bottom_left]
+
+ordered_points = np.array(order_points(board_points), dtype="float32")
+new_points = np.array(([0,0], [0,500], [500,500], [500,0]), dtype="float32")
+
+M = cv2.getPerspectiveTransform(ordered_points, new_points)
+board = cv2.warpPerspective(img, M, (500,500))
+
+
+
