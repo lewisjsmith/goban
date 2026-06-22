@@ -9,6 +9,7 @@ from math import atan2
 # 4. Add a threshold range to contour area rather than "nax" e.g. 60% of picture area
 # 5. Make Pythonic e.g. camelCase
 # 6. Split into modules
+# 7. Add enums
 
 def blur_pos_to_kernel_size(pos):
     return pos * 2 + 1
@@ -17,16 +18,31 @@ def pos_to_epsilon(pos, perimeter):
     epsilon_range = [0.01, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9]
     return epsilon_range[pos]*perimeter
 
+def pos_to_block(pos):
+    block_range = [3, 5, 7, 9, 11, 15, 21, 31, 41, 51]
+    return block_range[pos]
+
+def pos_to_c(pos):
+    c_range = [-10, -5, 0, 2, 5, 10]
+    return c_range[pos]
+
 def getMappedTrackBarPos(name, imageName, fn, *args):
     pos = cv2.getTrackbarPos(name, imageName)
     return fn(pos, *args)
 
-def manual_boundary(image):
+def manual_boundary(image, mode):
     cv2.namedWindow('img')
 
     cv2.createTrackbar('Gaussian Blur: kernel size', 'img', 0, 5, lambda x: None)
-    cv2.createTrackbar('Canny Edge: minimum threshold', 'img', 0, 255, lambda x: None)
-    cv2.createTrackbar('Canny Edge: maximum threshold', 'img', 0, 255, lambda x: None)
+
+    if mode == "CANNY":
+        cv2.createTrackbar('Canny Edge: minimum threshold', 'img', 0, 255, lambda x: None)
+        cv2.createTrackbar('Canny Edge: maximum threshold', 'img', 0, 255, lambda x: None)
+
+    if mode == "ADAPTIVE":
+        cv2.createTrackbar('Adaptive: block size', 'img', 0, 8, lambda x: None)
+        cv2.createTrackbar('Adaptive: C', 'img', 0, 5, lambda x: None)
+
     cv2.createTrackbar('Douglas-Peucker: epsilon', 'img', 0, 6, lambda x: None)
 
     # Grayscale
@@ -45,11 +61,17 @@ def manual_boundary(image):
         blur_pos = getMappedTrackBarPos('Gaussian Blur: kernel size', 'img', blur_pos_to_kernel_size)
         blur = cv2.GaussianBlur(gray, (blur_pos, blur_pos), 0)
 
-        # Edge detection, apertureSize 7 is also sufficient
-        t_min = cv2.getTrackbarPos('Canny Edge: minimum threshold', 'img')
-        t_max = cv2.getTrackbarPos('Canny Edge: maximum threshold', 'img')
-        edges = cv2.Canny(blur, t_min, t_max, apertureSize=5)
-        
+        if mode == "CANNY":
+            # Edge detection, apertureSize 7 is also sufficient
+            t_min = cv2.getTrackbarPos('Canny Edge: minimum threshold', 'img')
+            t_max = cv2.getTrackbarPos('Canny Edge: maximum threshold', 'img')
+            edges = cv2.Canny(blur, t_min, t_max, apertureSize=5)
+            
+        if mode == "ADAPTIVE":
+            th_block = getMappedTrackBarPos('Adaptive: block size', 'img', pos_to_block)
+            th_c = getMappedTrackBarPos('Adaptive: C', 'img', pos_to_c)
+            edges = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, th_block, th_c)
+
         # Contours
         contours, hierarchy = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -149,13 +171,13 @@ def scanBoard(boardImage):
             else:
                 cv2.destroyAllWindows()
 
-
 def main():
-    # image = cv2.imread("training/board_20260618-121132.jpg")
-    # image = cv2.imread("training/board_20260621-202226.jpg")
-    # image = cv2.imread("training/board_20260621-202617.jpg")
-    image = cv2.imread("training/board_20260621-204917.jpg")
-    board_points = manual_boundary(image)
+    image = cv2.imread("training/board_20260622-202257.jpg")
+    # image = cv2.imread("training/board_20260622-200312.jpg")
+    # image = cv2.imread("training/board_20260622-202050.jpg")
+
+    board_points = manual_boundary(image, "CANNY")
+    # board_points = manual_boundary(image, "ADAPTIVE")
 
     if board_points is None or len(board_points) != 4:
         print("Invalid, board not found.")
@@ -168,11 +190,7 @@ def main():
     if k in (27, ord('q')):
         cv2.destroyAllWindows()
 
-    scanBoard(board)
+    # scanBoard(board)
 
 if __name__ == '__main__':
     main()
-
-
-
-
