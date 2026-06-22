@@ -110,13 +110,13 @@ def getAreaOfPlay(image, points):
     # 540 / 18 = 30
     # 60 extra width each way added to accomodate
     ordered_points = np.array(order_points(points), dtype="float32")
-    new_points = np.array(([0,0], [0,540], [540,540], [540,0]), dtype="float32")
+    new_points = np.array(([30,30], [30,570], [570,570], [570,30]), dtype="float32")
 
     M = cv2.getPerspectiveTransform(ordered_points, new_points)
-    N = M.copy()
-    N[0,2] = N[0,2] + 30
-    N[1,2] = N[1,2] + 30
-    area_of_play = cv2.warpPerspective(image, N, (600, 600))
+    # N = M.copy()
+    # N[0,2] = N[0,2] + 30
+    # N[1,2] = N[1,2] + 30
+    area_of_play = cv2.warpPerspective(image, M, (600, 600))
 
     return area_of_play
 
@@ -157,7 +157,7 @@ def main():
     image = cv2.imread("training/board_20260621-204917.jpg")
     board_points = manual_boundary(image)
 
-    if not board_points:
+    if board_points is None or len(board_points) != 4:
         print("Invalid, board not found.")
         return
 
