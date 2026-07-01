@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from math import atan2
 
+import PySide6.QtCore
+
 # TODO
 # 1. Train and use classification model for stone and space detection, L=look into Lab colouring
 # 2. Clean up matrix logic, ratios instead of hard-coded
@@ -149,8 +151,10 @@ def scanBoard(boardImage):
     board = cv2.cvtColor(boardImage, cv2.COLOR_BGR2GRAY)
 
     # 5 for testing, 18 in reality)
-    for i in range(0, 5):
-        for j in range(0, 5):
+    # for i in range(0, 5):
+    #     for j in range(0, 5):
+    for i in range(0, 19):
+        for j in range(0, 19):
 
             # ------------------------------
             # cv2.imshow('board', board[
@@ -171,14 +175,70 @@ def scanBoard(boardImage):
             else:
                 cv2.destroyAllWindows()
 
+def distance(contour, pt):
+    cx, cy = pt
+    c = contour.reshape(-1, 2)  # flatten contour points
+    return ((c[:, 0] - cx)**2 + (c[:, 1] - cy)**2).min()
+
+def selectPoint(action, x, y, flags, state):
+
+    if action == cv2.EVENT_LBUTTONDOWN:
+
+        if state["point_to_fix"] is None:
+            state["index"] = min(
+                range(len(state["board_points"])),
+                key=lambda i: distance(state["board_points"][i], (x, y)))
+            state["point_to_fix"] = state["board_points"][state["index"]]
+
+    elif action == cv2.EVENT_LBUTTONUP:
+
+        if state["point_to_fix"] is not None:
+            if state["index"] != -1:
+                state["board_points"][state["index"]] = np.array([x, y])
+                state["point_to_fix"] = None
+                state["index"] = -1
+
+def manual_fix(image, board_points):
+
+    state = {
+        "board_points": board_points,
+        "point_to_fix": None,
+        "index": -1,
+    }
+
+    point_to_fix = []
+    index = -1
+
+    cv2.namedWindow("fix")
+    cv2.setMouseCallback("fix", selectPoint, state)
+
+    while True:
+        copy = image.copy()    
+
+        cv2.drawContours(copy, [state["board_points"]], -1, (0, 255, 0), 2)
+
+        cv2.imshow('fix', copy)
+        k = cv2.waitKey(30) & 0xFF
+        if k in (27, ord('q')):
+            cv2.destroyAllWindows()
+            break
+    
+    return state["board_points"]
+
 def main():
-    image = cv2.imread("training/board_20260622-202257.jpg")
+    # image = cv2.imread("training/board_20260622-202257.jpg")
     # image = cv2.imread("training/board_20260622-200312.jpg")
     # image = cv2.imread("training/board_20260622-202050.jpg")
+    image = cv2.imread("training/board_20260622-202148.jpg")
 
+    # 1. Initial border detection
     board_points = manual_boundary(image, "CANNY")
     # board_points = manual_boundary(image, "ADAPTIVE")
 
+    # 2. Temporary manual fix
+    board_points = manual_fix(image, board_points)
+
+    # 3. Scan tiles
     if board_points is None or len(board_points) != 4:
         print("Invalid, board not found.")
         return
@@ -190,7 +250,7 @@ def main():
     if k in (27, ord('q')):
         cv2.destroyAllWindows()
 
-    # scanBoard(board)
+    scanBoard(board)
 
 if __name__ == '__main__':
     main()
