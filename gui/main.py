@@ -9,10 +9,10 @@ import queue
 # add invalid status for out of bounds
 
 class EngineWrapper:
-    def __init__(self):
+    def __init__(self, init_board_size):
         self.engine_path = Path(__file__).parent.parent / "engine" / "build" / "prog"
         self.proc = subprocess.Popen(
-            [str(self.engine_path)],  
+            [str(self.engine_path), f"{init_board_size}"],  
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             text=True,
@@ -219,11 +219,11 @@ def main():
     # pygame setup
     pygame.init()
 
-    # parallel exe thread
-    engine = EngineWrapper()
+    init_board_size = 19
 
-    # game context - currently have to set Context() and send the command to resize
-    context = Context(9)
+    # parallel exe thread
+    engine = EngineWrapper(init_board_size)
+    context = Context(init_board_size)
 
     # context = Context(13)
     # engine.send_command(f"resize 13")

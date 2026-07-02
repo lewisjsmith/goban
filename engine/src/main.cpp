@@ -7,8 +7,15 @@
 
 int main(int argc, char* argv[]) {
 
+    // To-do error checking here
+    unsigned int size = 9;
+    if(argc == 2) {
+        std::istringstream iss( argv[1] );
+        iss >> size;
+    }
+
     std::string cmd;
-    Board* board = new Board();
+    Board* board = new Board(size);
 
     while(std::getline(std::cin, cmd)) {
 
@@ -32,7 +39,8 @@ int main(int argc, char* argv[]) {
         }
 
         if(action == "reset") {
-            board = new Board();
+            // To-do error checking here
+            board = new Board(size);
         }
 
         if(action == "resize") {
@@ -42,7 +50,10 @@ int main(int argc, char* argv[]) {
             unsigned int newSizeInt = std::stoi(newSize);
 
             if(newSizeInt == 9 || newSizeInt == 13 || newSizeInt == 19) {
-                board = new Board(std::stoi(newSize));    
+                // To-do error checking here
+                size = std::stoi(newSize);
+                board = new Board(size);    
+                
                 std::cout << "ok resize " << newSize << std::endl;
             } else {
                 std::cout << "invalid resize " << newSize << std::endl;
