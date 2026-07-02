@@ -1,6 +1,10 @@
 *.jpg
+*.pkl
+
 .env
 .venv
-training
-.learning.txt
-model
+
+__pycache__
+
+local
+
