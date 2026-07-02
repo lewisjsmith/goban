@@ -5,6 +5,8 @@
 #include <string>
 #include <sstream>
 
+#include <typeinfo>
+
 int main(int argc, char* argv[]) {
 
     // To-do error checking here
@@ -73,6 +75,17 @@ int main(int argc, char* argv[]) {
             }
 
             std::cout << boardDebug.str() << std::endl;
+        }
+
+        if(action == "load") {
+            std::string board_state;
+            iss >> board_state;
+            
+            for(int i = 0; i < board_state.size(); i++) {
+                board->set(i, board_state[i] - '0'); 
+            }
+
+            std::cout << "ok load " << board_state << std::endl;
         }
 
         if(action == "quit") {

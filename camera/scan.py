@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import joblib
 
-from features import featureExtraction
+from camera.features import featureExtraction
 
 class CannyStrategy:
     def setup_ui(self, window_name):
@@ -200,7 +200,7 @@ def run_board_scan():
     MODEL_PATH = Path(__file__).resolve().parent / "random_forest_model.pkl"
     model = joblib.load(MODEL_PATH)
 
-    IMAGE_PATH = Path(__file__).resolve().parent / "training/board_20260622-202257.jpg"
+    IMAGE_PATH = Path(__file__).resolve().parent / "local/training/board_20260622-202257.jpg"
     image = cv2.imread(IMAGE_PATH)
     
     strategy = AdaptiveStrategy()

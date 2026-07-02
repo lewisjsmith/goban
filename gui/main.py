@@ -1,8 +1,10 @@
-import pygame
 from pathlib import Path
+import pygame
 import subprocess
 import threading
 import queue
+
+from camera.scan import run_board_scan
 
 # TODO: 
 # settings data file 
@@ -192,6 +194,11 @@ def engineHandler(context: Context, engine: EngineWrapper):
                     context.boardSize = int(words[2])
                     context.reset()
 
+                if words[1] == "load":
+                    context.state = []
+                    for piece in words[2]:
+                        context.state.append(int(piece))
+
                 # piece placement
                 else:
                     context.state[int(words[1])] = int(words[2])
@@ -224,6 +231,11 @@ def main():
     # parallel exe thread
     engine = EngineWrapper(init_board_size)
     context = Context(init_board_size)
+
+    # Hard-coded scan
+    board_scan = run_board_scan()
+    board_scan_str = ''.join([f"{piece}" for piece in board_scan])
+    engine.send_command(f"load {board_scan_str}")
 
     # context = Context(13)
     # engine.send_command(f"resize 13")
