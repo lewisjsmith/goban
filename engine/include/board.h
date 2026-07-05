@@ -12,6 +12,8 @@ class Board {
     bool set(unsigned int, const char); 
     char get(unsigned int);
 
+    static const bool isValidBoardSize(unsigned int&);
+
     // private:
     std::vector<char> board;
     unsigned int width;

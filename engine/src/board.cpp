@@ -6,7 +6,7 @@ Board::Board() : width(9) {
 }
 
 Board::Board(unsigned int sz) : width(sz) {
-    if(sz == 9 || sz == 13 || sz == 19) board = std::vector<char>(sz*sz);
+    if(isValidBoardSize(sz)) board = std::vector<char>(sz*sz);
     else {
         throw std::runtime_error("Invalid board size");
     }
@@ -30,5 +30,9 @@ char Board::get(unsigned int pos) {
     if(pos < 0 || pos >= (width*width)) return 3;
     return board[pos];
 };
+
+const bool Board::isValidBoardSize(unsigned int& size) {
+    return (size == 9 || size == 13 || size == 19);
+}
 
 // Assumes that 0 is empty, 1 is black, 2 is white, 3 is OOB

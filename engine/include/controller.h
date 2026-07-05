@@ -159,16 +159,4 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
     return std::string("ok") + " " + std::to_string(latestPos) + " " + std::string(1, '0' + latestColour) + " " + result.str();
 }
 
-// get liberties func ? 
-/*
-    Basically,
-    Save the colour of the last move
-    Check if that last move has opposite colour liberty stones
-    Check if any of those opposite colour stones now have no liberties
-        If not, kill groups
-        Otherwise, check if the placed stone has no liberties
-            If not, kill placed stone
-        Else do nothing 
-*/
-
 #endif 
