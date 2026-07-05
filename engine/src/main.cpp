@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
             iss >> board_state;
             
             for(int i = 0; i < board_state.size(); i++) {
-                board->set(i, board_state[i] - '0'); 
+                board->set(i, static_cast<Colour>(board_state[i])); 
             }
 
             std::cout << "ok load " << board_state << std::endl;
