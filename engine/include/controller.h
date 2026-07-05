@@ -36,7 +36,7 @@ std::vector<unsigned int> getNeighbours(Board& board, unsigned int pos) {
 }
 
 // getGroupGivenSingleStone
-std::vector<unsigned int> getGroup(Board& board, unsigned int pos, char colour) {
+std::vector<unsigned int> getGroup(Board& board, unsigned int pos, Colour colour) {
 
     std::vector<unsigned int> group = {};
 
@@ -55,7 +55,7 @@ std::vector<unsigned int> getGroup(Board& board, unsigned int pos, char colour) 
         
         for(auto&n : neighbours){
             if(seen.count(n) != 0) continue;
-            char neighbour_colour = board.get(n);
+            Colour neighbour_colour = board.get(n);
             if(neighbour_colour == colour) queue.push(n);
             seen[n] = true;
         }
@@ -66,7 +66,7 @@ std::vector<unsigned int> getGroup(Board& board, unsigned int pos, char colour) 
 }   
 
 // getGroupNeighboursGivenGroup
-std::vector<unsigned int> getGroupNeighbours(Board& board, std::vector<unsigned int> group, char colour) {
+std::vector<unsigned int> getGroupNeighbours(Board& board, std::vector<unsigned int> group, Colour colour) {
     std::vector<unsigned int> groupNeighbours = {};
     std::unordered_map<unsigned int, bool> seen = {};
 
@@ -90,7 +90,7 @@ std::vector<unsigned int> getLiberties(Board& board, std::vector<unsigned int> g
     std::vector<unsigned int> liberties = {};
     
     for(auto& n : groupNeighbours) {
-        if(board.get(n) == 0){
+        if(board.get(n) == Colour::CLEAR){
             emptyStoneCount += 1;
             liberties.push_back(n);
         }
@@ -105,7 +105,7 @@ std::vector<unsigned int> getOppositeColourNeighbours(Board& board, std::vector<
     std::vector<unsigned int> oppositeColourNeighbours = {};
     
     for(auto& n : groupNeighbours) {
-        if(board.get(n) != 0){
+        if(board.get(n) != Colour::CLEAR){
             oppositeColourNeighbours.push_back(n);
         }
     }
@@ -114,7 +114,7 @@ std::vector<unsigned int> getOppositeColourNeighbours(Board& board, std::vector<
 }
 
 // Consider swapping colours to 0 and 1 for easy falsy conversion
-std::string removeDeadStones(Board& board, unsigned int latestPos, char latestColour) {
+std::string removeDeadStones(Board& board, unsigned int latestPos, Colour latestColour) {
 
     std::ostringstream result("");
 
@@ -123,9 +123,9 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
     std::vector<unsigned int> oppositeColourNeighbours = getOppositeColourNeighbours(board, groupNeighbours);
     std::vector<unsigned int> liberties = getLiberties(board, groupNeighbours);
 
-    if(oppositeColourNeighbours.empty()) return std::string("ok") + " " + std::to_string(latestPos) + " " + std::string(1, '0' + latestColour);
+    if(oppositeColourNeighbours.empty()) return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour));
     
-    char oppositeColour = board.get(oppositeColourNeighbours[0]);
+    Colour oppositeColour = board.get(oppositeColourNeighbours[0]);
     bool groupDeleted = false;
 
     for(auto& n : oppositeColourNeighbours) {
@@ -143,7 +143,7 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
             std::sort(oppositeGroup.begin(), oppositeGroup.end());
             for(auto& stone : oppositeGroup) {
                 result << " " << int(stone);
-                board.set(stone, 0);
+                board.set(stone, Colour::CLEAR);
             }
             groupDeleted = true;
         }
@@ -151,24 +151,12 @@ std::string removeDeadStones(Board& board, unsigned int latestPos, char latestCo
 
     if (!groupDeleted && liberties.empty()) {
         result << "invalid suicide";
-        result << " " << latestPos << " " << std::string(1, '0' + latestColour);
-        board.set(latestPos, 0);
+        result << " " << latestPos << " " << std::to_string(static_cast<int>(latestColour));
+        board.set(latestPos, Colour::CLEAR);
         return result.str();
     }
 
-    return std::string("ok") + " " + std::to_string(latestPos) + " " + std::string(1, '0' + latestColour) + " " + result.str();
+    return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour)) + " " + result.str();
 }
-
-// get liberties func ? 
-/*
-    Basically,
-    Save the colour of the last move
-    Check if that last move has opposite colour liberty stones
-    Check if any of those opposite colour stones now have no liberties
-        If not, kill groups
-        Otherwise, check if the placed stone has no liberties
-            If not, kill placed stone
-        Else do nothing 
-*/
 
 #endif 

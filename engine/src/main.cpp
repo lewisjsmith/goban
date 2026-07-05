@@ -1,24 +1,39 @@
-#include "board.h"
-#include "controller.h"
-
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <unordered_map>
+
+#include "board.h"
+#include "controller.h"
+
+bool boardInit(unsigned int& size, int argc, char* argv[]) {
+    
+    if (argc > 2) {
+        return false;
+    }
+
+    if (argc == 2) {
+        std::istringstream iss(argv[1]);
+        if (!(iss >> size) || !iss.eof() || !Board::isValidBoardSize(size)) {
+            std::cerr << "Invalid size: " << argv[1] << '\n';
+            return false;
+        }
+    }
+
+    return true;
+}
 
 #include <typeinfo>
 
 int main(int argc, char* argv[]) {
 
-    // To-do error checking here
     unsigned int size = 9;
-    if(argc == 2) {
-        std::istringstream iss( argv[1] );
-        iss >> size;
-    }
+    if(!boardInit(size, argc, argv)) return EXIT_FAILURE;
 
-    std::string cmd;
     Board* board = new Board(size);
 
+    std::string cmd;
+    
     while(std::getline(std::cin, cmd)) {
 
         std::istringstream iss(cmd);
@@ -26,22 +41,23 @@ int main(int argc, char* argv[]) {
         iss >> action;
 
         if(action == "play"){
-            std::string colour;
-            std::string move;
+            std::string colour_str;
+            std::string move_str;
 
-            iss >> move >> colour;
+            iss >> move_str >> colour_str;
 
-            bool stonePlaced = board->set(std::stoi(move), std::stoi(colour)); 
-
-            if(stonePlaced) {
-                std::cout << removeDeadStones(*board, std::stoi(move), std::stoi(colour)) << std::endl;
-            } else {
-                std::cout << "invalid filled " << std::stoi(move) << std::endl;
+            int move = std::stoi(move_str);
+            int colour = std::stoi(colour_str);
+            if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
+                if(board->set(move, static_cast<Colour>(colour))) {
+                    std::cout << removeDeadStones(*board, move, static_cast<Colour>(colour)) << std::endl;
+                } else {
+                    std::cout << "invalid filled " << move << std::endl;
+                }
             }
         }
 
         if(action == "reset") {
-            // To-do error checking here
             board = new Board(size);
         }
 
@@ -51,7 +67,8 @@ int main(int argc, char* argv[]) {
 
             unsigned int newSizeInt = std::stoi(newSize);
 
-            if(newSizeInt == 9 || newSizeInt == 13 || newSizeInt == 19) {
+            if(Board::isValidBoardSize(newSizeInt)) {
+
                 // To-do error checking here
                 size = std::stoi(newSize);
                 board = new Board(size);    
@@ -91,13 +108,6 @@ int main(int argc, char* argv[]) {
         if(action == "quit") {
             break;
         }
-
-        // simple board for testing
-        // for(int i = 0; i < ((board->width)*(board->width)); i++) {
-        //     if(i % 9 == 0) std::cout << std::endl;
-        //     std::cout << int(board->board[i]) << " ";
-        // }
-        //
     }
 
     return 0;

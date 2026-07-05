@@ -85,51 +85,51 @@ TEST(getGroupTest, BoundarySingleStone) {
 
     // Corners
     board = new Board(9); 
-    board->set(0, 1);
-    got = getGroup(*board, 0, 1);
+    board->set(0, Colour::BLACK);
+    got = getGroup(*board, 0, Colour::BLACK);
     want = {0};
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(8, 1);
-    got = getGroup(*board, 8, 1);
+    board->set(8, Colour::BLACK);
+    got = getGroup(*board, 8, Colour::BLACK);
     want = {8};
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(72, 1);
-    got = getGroup(*board, 72, 1);
+    board->set(72, Colour::BLACK);
+    got = getGroup(*board, 72, Colour::BLACK);
     want = {72};
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(80, 1);
-    got = getGroup(*board, 80, 1);
+    board->set(80, Colour::BLACK);
+    got = getGroup(*board, 80, Colour::BLACK);
     want = {80};
     ASSERT_EQ(got, want);
 
     // Sides
     board = new Board(9); 
-    board->set(4, 1);
-    got = getGroup(*board, 4, 1);
+    board->set(4, Colour::BLACK);
+    got = getGroup(*board, 4, Colour::BLACK);
     want = {4};
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(44, 1);
-    got = getGroup(*board, 44, 1);
+    board->set(44, Colour::BLACK);
+    got = getGroup(*board, 44, Colour::BLACK);
     want = {44};
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(76, 1);
-    got = getGroup(*board, 76, 1);
+    board->set(76, Colour::BLACK);
+    got = getGroup(*board, 76, Colour::BLACK);
     want = {76};
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(36, 1);
-    got = getGroup(*board, 36, 1);
+    board->set(36, Colour::BLACK);
+    got = getGroup(*board, 36, Colour::BLACK);
     want = {36};
     ASSERT_EQ(got, want);
 }
@@ -140,8 +140,8 @@ TEST(getGroupTest, SingleStone) {
     std::vector<unsigned int> want;
 
     board = new Board(9); 
-    board->set(31, 1);
-    got = getGroup(*board, 31, 1);
+    board->set(31, Colour::BLACK);
+    got = getGroup(*board, 31, Colour::BLACK);
     want = {31};
     ASSERT_EQ(got, want);
 }
@@ -152,10 +152,10 @@ TEST(getGroupTest, BoundaryGroup) {
     std::vector<unsigned int> want;
 
     board = new Board(9); 
-    board->set(0, 1);
-    board->set(1, 1);
-    board->set(9, 1);
-    got = getGroup(*board, 0, 1);
+    board->set(0, Colour::BLACK);
+    board->set(1, Colour::BLACK);
+    board->set(9, Colour::BLACK);
+    got = getGroup(*board, 0, Colour::BLACK);
     want = {0, 1, 9};
     ASSERT_EQ(got, want);
 }
@@ -166,12 +166,12 @@ TEST(getGroupTest, Group) {
     std::vector<unsigned int> want;
 
     board = new Board(9); 
-    board->set(22, 1);
-    board->set(31, 1);
-    board->set(40, 1);
-    board->set(30, 1);
-    board->set(32, 1);
-    got = getGroup(*board, 31, 1);
+    board->set(22, Colour::BLACK);
+    board->set(31, Colour::BLACK);
+    board->set(40, Colour::BLACK);
+    board->set(30, Colour::BLACK);
+    board->set(32, Colour::BLACK);
+    got = getGroup(*board, 31, Colour::BLACK);
     want = {22, 30, 31, 32, 40};
     std::sort(got.begin(), got.end());
     ASSERT_EQ(got, want);
@@ -183,26 +183,26 @@ TEST(getGroupNeighboursTest, Group) {
     std::vector<unsigned int> want;
 
     board = new Board(9); 
-    board->set(0, 1);
-    board->set(1, 1);
-    board->set(9, 1);
-    got = getGroupNeighbours(*board, {0, 1, 9}, 1);
+    board->set(0, Colour::BLACK);
+    board->set(1, Colour::BLACK);
+    board->set(9, Colour::BLACK);
+    got = getGroupNeighbours(*board, {0, 1, 9}, Colour::BLACK);
     want = {2, 10, 18};
     ASSERT_EQ(got, want);  
     
 
     board = new Board(9); 
-    board->set(30, 1);
-    board->set(31, 1);
-    board->set(32, 1);
-    board->set(39, 1);
-    board->set(41, 1);
-    board->set(42, 1);
-    board->set(43, 1);
-    board->set(48, 1);
-    board->set(49, 1);
-    board->set(50, 1);
-    got = getGroupNeighbours(*board, {30, 31, 32, 39, 41, 42, 43, 48, 49, 50}, 1);
+    board->set(30, Colour::BLACK);
+    board->set(31, Colour::BLACK);
+    board->set(32, Colour::BLACK);
+    board->set(39, Colour::BLACK);
+    board->set(41, Colour::BLACK);
+    board->set(42, Colour::BLACK);
+    board->set(43, Colour::BLACK);
+    board->set(48, Colour::BLACK);
+    board->set(49, Colour::BLACK);
+    board->set(50, Colour::BLACK);
+    got = getGroupNeighbours(*board, {30, 31, 32, 39, 41, 42, 43, 48, 49, 50}, Colour::BLACK);
     std::sort(got.begin(), got.end());
     want = {21, 22, 23, 29, 33, 34, 38, 40, 44, 47, 51, 52, 57, 58, 59};
     ASSERT_EQ(got, want);   
@@ -214,7 +214,7 @@ TEST(getLibertiesTest, Group) {
     std::vector<unsigned int> want;
 
     board = new Board(9); 
-    board->set(0, 1);
+    board->set(0, Colour::BLACK);
     got = getLiberties(*board, {1, 9});
     want = {1, 9};
     std::sort(got.begin(), got.end());
@@ -222,27 +222,27 @@ TEST(getLibertiesTest, Group) {
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(0, 1);
-    board->set(1, 2);
+    board->set(0, Colour::BLACK);
+    board->set(1, Colour::WHITE);
     got = getLiberties(*board, {1, 9});
     want = {9};
     std::sort(got.begin(), got.end());
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(30, 1);
-    board->set(31, 1);
-    board->set(32, 1);
-    board->set(39, 1);
-    board->set(41, 1);
-    board->set(42, 1);
-    board->set(43, 1);
-    board->set(48, 1);
-    board->set(49, 1);
-    board->set(50, 1);
-    board->set(22, 2);
-    board->set(44, 2);
-    board->set(57, 2);
+    board->set(30, Colour::BLACK);
+    board->set(31, Colour::BLACK);
+    board->set(32, Colour::BLACK);
+    board->set(39, Colour::BLACK);
+    board->set(41, Colour::BLACK);
+    board->set(42, Colour::BLACK);
+    board->set(43, Colour::BLACK);
+    board->set(48, Colour::BLACK);
+    board->set(49, Colour::BLACK);
+    board->set(50, Colour::BLACK);
+    board->set(22, Colour::WHITE);
+    board->set(44, Colour::WHITE);
+    board->set(57, Colour::WHITE);
     got = getLiberties(*board, {21, 22, 23, 29, 33, 34, 38, 40, 44, 47, 51, 52, 57, 58, 59});
     std::sort(got.begin(), got.end());
     want = {21, 23, 29, 33, 34, 38, 40, 47, 51, 52, 58, 59};
@@ -255,34 +255,34 @@ TEST(getOppositeColourNeighboursTest, Group) {
     std::vector<unsigned int> want;
 
     board = new Board(9); 
-    board->set(0, 1);
+    board->set(0, Colour::BLACK);
     got = getOppositeColourNeighbours(*board, {1, 9});
     want = {};
     std::sort(got.begin(), got.end());
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(0, 1);
-    board->set(1, 2);
+    board->set(0, Colour::BLACK);
+    board->set(1, Colour::WHITE);
     got = getOppositeColourNeighbours(*board, {1, 9});
     want = {1};
     std::sort(got.begin(), got.end());
     ASSERT_EQ(got, want);
 
     board = new Board(9); 
-    board->set(30, 1);
-    board->set(31, 1);
-    board->set(32, 1);
-    board->set(39, 1);
-    board->set(41, 1);
-    board->set(42, 1);
-    board->set(43, 1);
-    board->set(48, 1);
-    board->set(49, 1);
-    board->set(50, 1);
-    board->set(22, 2);
-    board->set(44, 2);
-    board->set(57, 2);
+    board->set(30, Colour::BLACK);
+    board->set(31, Colour::BLACK);
+    board->set(32, Colour::BLACK);
+    board->set(39, Colour::BLACK);
+    board->set(41, Colour::BLACK);
+    board->set(42, Colour::BLACK);
+    board->set(43, Colour::BLACK);
+    board->set(48, Colour::BLACK);
+    board->set(49, Colour::BLACK);
+    board->set(50, Colour::BLACK);
+    board->set(22, Colour::WHITE);
+    board->set(44, Colour::WHITE);
+    board->set(57, Colour::WHITE);
     got = getOppositeColourNeighbours(*board, {21, 22, 23, 29, 33, 34, 38, 40, 44, 47, 51, 52, 57, 58, 59});
     std::sort(got.begin(), got.end());
     want = {22, 44, 57};
@@ -295,92 +295,92 @@ TEST(removeDeadStonesTest, Group) {
     std::string want;
 
     board = new Board(9);
-    board->set(0, 1);
-    board->set(1, 1);
-    board->set(9, 1);
-    board->set(10, 1);
+    board->set(0, Colour::BLACK);
+    board->set(1, Colour::BLACK);
+    board->set(9, Colour::BLACK);
+    board->set(10, Colour::BLACK);
 
-    board->set(2, 2);
-    board->set(11, 2);
-    board->set(18, 2);
-    board->set(19, 2); 
+    board->set(2, Colour::WHITE);
+    board->set(11, Colour::WHITE);
+    board->set(18, Colour::WHITE);
+    board->set(19, Colour::WHITE); 
 
-    got = removeDeadStones(*board, 19, 2);
+    got = removeDeadStones(*board, 19, Colour::WHITE);
     want = "ok 19 2 dead 0 1 9 10";
 
     ASSERT_EQ(got, want);
 
     board = new Board(9);
-    board->set(30, 1);
-    board->set(31, 1);
-    board->set(32, 1);
-    board->set(39, 1);
-    board->set(41, 1);
-    board->set(48, 1);
-    board->set(49, 1);
-    board->set(50, 1);
+    board->set(30, Colour::BLACK);
+    board->set(31, Colour::BLACK);
+    board->set(32, Colour::BLACK);
+    board->set(39, Colour::BLACK);
+    board->set(41, Colour::BLACK);
+    board->set(48, Colour::BLACK);
+    board->set(49, Colour::BLACK);
+    board->set(50, Colour::BLACK);
 
-    board->set(21, 2);
-    board->set(22, 2);
-    board->set(23, 2);
-    board->set(29, 2); 
-    board->set(33, 2);
-    board->set(38, 2);
-    board->set(40, 2);
-    board->set(42, 2);
-    board->set(47, 2); 
-    board->set(51, 2);
-    board->set(57, 2);
-    board->set(58, 2);
-    board->set(59, 2); 
+    board->set(21, Colour::WHITE);
+    board->set(22, Colour::WHITE);
+    board->set(23, Colour::WHITE);
+    board->set(29, Colour::WHITE); 
+    board->set(33, Colour::WHITE);
+    board->set(38, Colour::WHITE);
+    board->set(40, Colour::WHITE);
+    board->set(42, Colour::WHITE);
+    board->set(47, Colour::WHITE); 
+    board->set(51, Colour::WHITE);
+    board->set(57, Colour::WHITE);
+    board->set(58, Colour::WHITE);
+    board->set(59, Colour::WHITE); 
 
-    got = removeDeadStones(*board, 40, 2);
+    got = removeDeadStones(*board, 40, Colour::WHITE);
     want = "ok 40 2 dead 30 31 32 39 41 48 49 50";
 
     ASSERT_EQ(got, want);
 
     board = new Board(9);
-    board->set(20, 1);
-    board->set(28, 1);
-    board->set(38, 1);
-    board->set(30, 1);
-    board->set(22, 1);
-    board->set(32, 1);
-    board->set(40, 1);
+    board->set(20, Colour::BLACK);
+    board->set(28, Colour::BLACK);
+    board->set(38, Colour::BLACK);
+    board->set(30, Colour::BLACK);
+    board->set(22, Colour::BLACK);
+    board->set(32, Colour::BLACK);
+    board->set(40, Colour::BLACK);
 
-    board->set(29, 2);
-    board->set(31, 2);
+    board->set(29, Colour::WHITE);
+    board->set(31, Colour::WHITE);
 
-    got = removeDeadStones(*board, 30 , 1);
+    got = removeDeadStones(*board, 30 , Colour::BLACK);
     want = "ok 30 1 dead 29 31";
 
     ASSERT_EQ(got, want);
 
     board = new Board(9);
-    board->set(30, 1);
-    board->set(31, 1);
-    board->set(32, 1);
-    board->set(39, 1);
-    board->set(41, 1);
-    board->set(48, 1);
-    board->set(49, 1);
-    board->set(50, 1);
+    board->set(30, Colour::BLACK);
+    board->set(31, Colour::BLACK);
+    board->set(32, Colour::BLACK);
+    board->set(39, Colour::BLACK);
+    board->set(41, Colour::BLACK);
+    board->set(48, Colour::BLACK);
+    board->set(49, Colour::BLACK);
+    board->set(50, Colour::BLACK);
 
-    board->set(21, 2);
-    board->set(22, 2);
-    board->set(23, 2);
-    board->set(29, 2); 
+    board->set(21, Colour::WHITE);
+    board->set(22, Colour::WHITE);
+    board->set(23, Colour::WHITE);
+    board->set(29, Colour::WHITE); 
     
-    board->set(38, 2);
-    board->set(40, 2);
-    board->set(42, 2);
-    board->set(47, 2); 
-    board->set(51, 2);
-    board->set(57, 2);
-    board->set(58, 2);
-    board->set(59, 2); 
+    board->set(38, Colour::WHITE);
+    board->set(40, Colour::WHITE);
+    board->set(42, Colour::WHITE);
+    board->set(47, Colour::WHITE); 
+    board->set(51, Colour::WHITE);
+    board->set(57, Colour::WHITE);
+    board->set(58, Colour::WHITE);
+    board->set(59, Colour::WHITE); 
 
-    got = removeDeadStones(*board, 40, 2);
+    got = removeDeadStones(*board, 40, Colour::WHITE);
     want = "invalid suicide 40 2";
 
     ASSERT_EQ(got, want);

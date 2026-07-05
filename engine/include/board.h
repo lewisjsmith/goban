@@ -3,17 +3,32 @@
 
 #include <vector>
 
+enum class Colour : char {
+    CLEAR = 0,
+    BLACK = 1,
+    WHITE = 2,
+    OOB = 3
+};
+
 class Board {
 
     public:
     Board();
     Board(unsigned int);
 
-    bool set(unsigned int, const char); 
-    char get(unsigned int);
+    bool set(unsigned int, Colour); 
+    Colour get(unsigned int) const;
+
+    bool placeStone(unsigned int, Colour);
+    bool removeStone(unsigned int);
+
+    bool isOutOfBounds(unsigned int) const;
+
+    static bool isValidBoardSize(unsigned int);
+    static bool isValidBoardValue(Colour);
 
     // private:
-    std::vector<char> board;
+    std::vector<Colour> board;
     unsigned int width;
 
 };
