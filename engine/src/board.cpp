@@ -2,37 +2,51 @@
 #include <stdexcept>
 
 Board::Board() : width(9) {
-    board = std::vector<char>(9*9); 
+    board = std::vector<Colour>(9*9); 
 }
 
-Board::Board(unsigned int sz) : width(sz) {
-    if(isValidBoardSize(sz)) board = std::vector<char>(sz*sz);
+Board::Board(unsigned int size) : width(size) {
+    if(isValidBoardSize(size)) board = std::vector<Colour>(size*size);
     else {
         throw std::runtime_error("Invalid board size");
     }
 }
 
-bool Board::set(unsigned int pos, const char c) {
-    char pos_val = get(pos);
-    if(pos_val == 0 && (c == 1 || c == 2)){ 
-        board[pos] = c;
+bool Board::placeStone(unsigned int pos, Colour colour){
+    Colour curr = get(pos);
+    if(curr == Colour::CLEAR && (colour == Colour::BLACK || colour == Colour::WHITE)){ 
+        set(pos, colour);
         return true;
     }
-    else if((pos_val == 1 || pos_val == 2) && c == 0) {
-        board[pos] = c;
-        return true;
-    } else {
-        return false;
-    }
+    return false;
 };
 
-char Board::get(unsigned int pos) {
-    if(pos < 0 || pos >= (width*width)) return 3;
+bool Board::removeStone(unsigned int pos){
+    return set(pos, Colour::CLEAR);
+};
+
+bool Board::set(unsigned int pos, Colour colour) {
+    if(!isValidBoardValue(colour)) return false;
+    if(isOutOfBounds(pos)) return false;
+    board[pos] = colour;
+    return true;
+};
+
+Colour Board::get(unsigned int pos) const {
+    if(isOutOfBounds(pos)) return Colour::OOB;
     return board[pos];
 };
 
-const bool Board::isValidBoardSize(unsigned int& size) {
+bool Board::isOutOfBounds(unsigned int pos) const {
+    return pos >= (width*width);
+}
+
+bool Board::isValidBoardSize(unsigned int size) {
     return (size == 9 || size == 13 || size == 19);
 }
 
-// Assumes that 0 is empty, 1 is black, 2 is white, 3 is OOB
+bool Board::isValidBoardValue(Colour colour) {
+    return colour == Colour::BLACK ||
+        colour == Colour::WHITE ||
+        colour == Colour::CLEAR;
+}

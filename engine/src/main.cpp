@@ -46,11 +46,12 @@ int main(int argc, char* argv[]) {
 
             int move = std::stoi(move_str);
             int colour = std::stoi(colour_str);
-
-            if(board->set(move, colour)) {
-                std::cout << removeDeadStones(*board, move, colour) << std::endl;
-            } else {
-                std::cout << "invalid filled " << move << std::endl;
+            if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
+                if(board->set(move, static_cast<Colour>(colour))) {
+                    std::cout << removeDeadStones(*board, move, static_cast<Colour>(colour)) << std::endl;
+                } else {
+                    std::cout << "invalid filled " << move << std::endl;
+                }
             }
         }
 
@@ -64,7 +65,7 @@ int main(int argc, char* argv[]) {
 
             unsigned int newSizeInt = std::stoi(newSize);
 
-            if(newSizeInt == 9 || newSizeInt == 13 || newSizeInt == 19) {
+            if(Board::isValidBoardSize(newSizeInt)) {
 
                 // To-do error checking here
                 size = std::stoi(newSize);
