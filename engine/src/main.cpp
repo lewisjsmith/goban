@@ -6,6 +6,17 @@
 #include "board.h"
 #include "controller.h"
 
+class Settings {
+public:
+    unsigned int size = 9;
+    std::vector<Colour> saved_board{size * size, Colour::CLEAR};
+
+    void resize(unsigned int newSize) {
+        size = newSize;
+        saved_board.assign(size * size, Colour::CLEAR);
+    }
+};
+
 bool boardInit(unsigned int& size, int argc, char* argv[]) {
     
     if (argc > 2) {
@@ -25,10 +36,11 @@ bool boardInit(unsigned int& size, int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
 
-    unsigned int size = 9;
-    if(!boardInit(size, argc, argv)) return EXIT_FAILURE;
+    Settings user_settings;
 
-    Board* board = new Board(size);
+    if(!boardInit(user_settings.size, argc, argv)) return EXIT_FAILURE;
+
+    Board* board = new Board(user_settings.size);
 
     std::string cmd;
     
@@ -54,8 +66,9 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // Needs a differentiator between new game and reset to previously loaded
         if(action == "reset") {
-            board = new Board(size);
+            board = new Board(user_settings.size);
         }
 
         if(action == "resize") {
@@ -64,9 +77,10 @@ int main(int argc, char* argv[]) {
 
             unsigned int newSizeInt = std::stoi(newSize);
             if(Board::isValidBoardSize(newSizeInt)) {
-                size = std::stoi(newSize);
-                board = new Board(size);    
-                std::cout << "ok resize " << newSize << std::endl;
+                user_settings.resize(newSizeInt);
+                board = new Board(user_settings.size);    
+                std::cout << "ok resize " << user_settings.size << std::endl;
+
             } else {
                 std::cout << "invalid resize " << newSize << std::endl;
             }
@@ -80,6 +94,7 @@ int main(int argc, char* argv[]) {
             std::string board_state;
             iss >> board_state;
             board->setBoardState(board_state);
+            user_settings.saved_board = board->getBoardState();
         }
 
         if(action == "quit") {

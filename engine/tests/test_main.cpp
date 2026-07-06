@@ -21,8 +21,6 @@
     72  73  74  75  76  77  78  79  80
 */
 
-// SET METHOD TEST NEEDED
-
 TEST(getNeighbourTest, OOB) {
     Board* board = new Board(9); 
     std::vector<unsigned int> a = {};

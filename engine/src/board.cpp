@@ -7,11 +7,11 @@
 #include "board.h"
 
 Board::Board() : width(9) {
-    board = std::vector<Colour>(9*9); 
+    board = std::vector<Colour>(9*9, Colour::CLEAR); 
 }
 
 Board::Board(unsigned int size) : width(size) {
-    if(isValidBoardSize(size)) board = std::vector<Colour>(size*size);
+    if(isValidBoardSize(size)) board = std::vector<Colour>(size*size, Colour::CLEAR);
     else {
         throw std::runtime_error("Invalid board size");
     }
