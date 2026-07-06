@@ -43,16 +43,13 @@ int main(int argc, char* argv[]) {
         if(action == "play"){
             std::string colour_str;
             std::string move_str;
-
             iss >> move_str >> colour_str;
-
             int move = std::stoi(move_str);
             int colour = std::stoi(colour_str);
+
             if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
                 if(board->placeStone(move, static_cast<Colour>(colour))) {
-
                     std::cout << removeDeadStones(*board, move, static_cast<Colour>(colour)) << std::endl;
-
                 } else {
                     std::cout << "invalid filled " << move << std::endl;
                 }
@@ -68,18 +65,13 @@ int main(int argc, char* argv[]) {
             iss >> newSize;
 
             unsigned int newSizeInt = std::stoi(newSize);
-
             if(Board::isValidBoardSize(newSizeInt)) {
-
-                // To-do error checking here
                 size = std::stoi(newSize);
                 board = new Board(size);    
-                
                 std::cout << "ok resize " << newSize << std::endl;
             } else {
                 std::cout << "invalid resize " << newSize << std::endl;
             }
-            
         }
 
         if(action == "print") {
