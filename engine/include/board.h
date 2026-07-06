@@ -2,6 +2,7 @@
 #define  BOARD_H
 
 #include <vector>
+#include <string>
 
 enum class Colour : char {
     CLEAR = 0,
@@ -20,6 +21,9 @@ class Board {
     Colour get(unsigned int) const;
 
     const std::vector<Colour>& getBoardState();
+    bool setBoardState(const std::string&);
+
+    void printBoard();
 
     unsigned int getWidth() const;
     bool setWidth(unsigned int);

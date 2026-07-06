@@ -1,5 +1,9 @@
 #include "board.h"
 #include <stdexcept>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cmath>
 
 Board::Board() : width(9) {
     board = std::vector<Colour>(9*9); 
@@ -39,6 +43,35 @@ Colour Board::get(unsigned int pos) const {
 
 const std::vector<Colour>& Board::getBoardState() {
     return board;
+}
+
+bool Board::setBoardState(const std::string& boardState) {
+    unsigned int width = std::sqrt(boardState.size());
+    if(!isValidBoardSize(width)) return false;
+    for(unsigned int i = 0; i < boardState.size(); i++) {
+        Colour stone_colour = static_cast<Colour>(boardState[i] - '0');
+        if(stone_colour != Colour::CLEAR && stone_colour != Colour::BLACK && stone_colour != Colour::WHITE) return false;
+        set(i, stone_colour); 
+    }
+
+    std::ostringstream oss;
+    for(auto& c : getBoardState()) {
+        oss << static_cast<int>(c);
+    }
+    std::cout << "ok load " << oss.str() << std::endl;
+
+    return true;
+}
+
+void Board::printBoard() {
+    std::ostringstream boardDebug;
+    for(int i = 0; i < board.size(); i++) {
+        boardDebug << (int)board[i] << " ";
+        if((i+1)%width == 0) {
+            boardDebug << "\n";
+        }
+    }
+    std::cout << boardDebug.str() << std::endl;
 }
 
 unsigned int Board::getWidth() const {

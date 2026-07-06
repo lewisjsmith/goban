@@ -83,33 +83,13 @@ int main(int argc, char* argv[]) {
         }
 
         if(action == "print") {
-            
-            std::ostringstream boardDebug;
-            std::vector<Colour> boardstate = board->getBoardState();
-
-            for(int i = 0; i < boardstate.size(); i++) {
-                boardDebug << (int)boardstate[i] << " ";
-                if((i+1)%board->getWidth() == 0) {
-                   boardDebug << "\n";
-                }
-            }
-
-            std::cout << boardDebug.str() << std::endl;
+            board->printBoard();
         }
 
         if(action == "load") {
             std::string board_state;
             iss >> board_state;
-            
-            for(unsigned int i = 0; i < board_state.size(); i++) {
-                board->set(i, static_cast<Colour>(board_state[i] - '0')); 
-            }
-
-            std::ostringstream oss;
-            for(auto& c : board->getBoardState()) {
-                oss << static_cast<int>(c);
-            }
-            std::cout << "ok load " << oss.str() << std::endl;
+            board->setBoardState(board_state);
         }
 
         if(action == "quit") {
