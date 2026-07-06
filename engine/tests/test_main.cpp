@@ -1,11 +1,11 @@
-#include "board.h"
-#include "controller.h"
-
-#include "gtest/gtest.h"
-
 #include <vector>
 #include <string>
 #include <algorithm>
+
+#include "gtest/gtest.h"
+
+#include "board.h"
+#include "controller.h"
 
 /*
     9x9 Board Reference

@@ -1,9 +1,10 @@
-#include "board.h"
 #include <stdexcept>
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <cmath>
+
+#include "board.h"
 
 Board::Board() : width(9) {
     board = std::vector<Colour>(9*9); 

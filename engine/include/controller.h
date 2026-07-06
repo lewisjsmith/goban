@@ -1,15 +1,15 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "board.h"
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 #include <queue> 
 #include <sstream>
-
 #include <string>
 #include <algorithm>
+
+#include "board.h"
 
 // getPositionsAroundStone
 std::vector<unsigned int> getNeighbours(const Board& board, unsigned int pos) {

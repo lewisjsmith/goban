@@ -23,8 +23,6 @@ bool boardInit(unsigned int& size, int argc, char* argv[]) {
     return true;
 }
 
-#include <typeinfo>
-
 int main(int argc, char* argv[]) {
 
     unsigned int size = 9;
