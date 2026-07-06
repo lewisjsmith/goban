@@ -2,8 +2,9 @@
 #define CONTROLLER_H
 
 #include <vector>
-#include <unordered_map>
 #include <unordered_set>
+#include <unordered_map>
+#include <set>
 #include <queue> 
 #include <sstream>
 #include <string>
@@ -113,49 +114,117 @@ std::vector<unsigned int> getOppositeColourNeighbours(const Board& board, std::v
     return oppositeColourNeighbours;
 }
 
-std::string removeDeadStones(Board& board, unsigned int latestPos, Colour latestColour) {
+enum MoveEvaluation {
+    OK,
+    FILLED,
+    SUICIDE
+};
 
-    std::ostringstream result("");
+std::string evaluationResponse(MoveEvaluation eval, unsigned int latestPos, Colour latestColour, std::set<unsigned int> deadStones) {
+    switch(eval) {
+        case MoveEvaluation::OK:
+        {
+            std::ostringstream oss("");
+            for(auto start = deadStones.begin(); start != deadStones.end(); start++) {
+                oss << " ";
+                oss << static_cast<int>(*start);
+            }
+            if(deadStones.empty()) return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour));
+            return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour)) + " " + "dead" + oss.str();
+        }
+        case MoveEvaluation::FILLED:
+        {
+            return std::string("invalid filled") + " " + std::to_string(latestPos);
+        }
+        case MoveEvaluation::SUICIDE:
+        {
+            return std::string("invalid suicide") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour));
+        }
+    }
+    return "evaluation error";
+}
 
+std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestColour) {
     std::vector<unsigned int> group = getGroup(board, latestPos, latestColour);
     std::vector<unsigned int> groupNeighbours = getGroupNeighbours(board, group, latestColour);
     std::vector<unsigned int> oppositeColourNeighbours = getOppositeColourNeighbours(board, groupNeighbours);
     std::vector<unsigned int> liberties = getLiberties(board, groupNeighbours);
 
-    // Happy path 
-    if(oppositeColourNeighbours.empty()) return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour));
-    
-    Colour oppositeColour = board.get(oppositeColourNeighbours[0]);
-    bool groupDeleted = false;
+    std::set<unsigned int> deadStones;
 
+    if(oppositeColourNeighbours.empty()){
+        return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+    } 
+
+    Colour oppositeColour = board.get(oppositeColourNeighbours[0]);
     for(auto& n : oppositeColourNeighbours) {
+        if(deadStones.count(n) == 1) continue;
         std::vector<unsigned int> oppositeGroup = getGroup(board, n, oppositeColour);
         std::vector<unsigned int> oppositeGroupNeighbours = getGroupNeighbours(board, oppositeGroup, oppositeColour);
         std::vector<unsigned int> oppositeGroupLiberties = getLiberties(board, oppositeGroupNeighbours);
 
-        // Delete opposite group as you have taken the last liberty 
         if(oppositeGroupLiberties.empty()) {
-            if (std::string multiGroup = result.str(); multiGroup.find("dead") == std::string::npos){
-                result << "dead";
-            }
             std::sort(oppositeGroup.begin(), oppositeGroup.end());
             for(auto& stone : oppositeGroup) {
-                result << " " << int(stone);
                 board.removeStone(stone);
+                deadStones.insert(stone);
             }
-            groupDeleted = true;
         }
     }
 
-    // If the neighbouring group wasn't deleted and there are no liberties around the placed stone
-    if (!groupDeleted && liberties.empty()) {
-        result << "invalid suicide";
-        result << " " << latestPos << " " << std::to_string(static_cast<int>(latestColour));
+    if (deadStones.empty() && liberties.empty()) {
         board.set(latestPos, Colour::CLEAR);
-        return result.str();
+        return evaluationResponse(MoveEvaluation::SUICIDE, latestPos, latestColour, deadStones);
     }
 
-    return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour)) + " " + result.str();
+    return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
 }
+
+
+
+// std::string removeDeadStones(Board& board, unsigned int latestPos, Colour latestColour) {
+
+//     std::ostringstream result("");
+
+//     std::vector<unsigned int> group = getGroup(board, latestPos, latestColour);
+//     std::vector<unsigned int> groupNeighbours = getGroupNeighbours(board, group, latestColour);
+//     std::vector<unsigned int> oppositeColourNeighbours = getOppositeColourNeighbours(board, groupNeighbours);
+//     std::vector<unsigned int> liberties = getLiberties(board, groupNeighbours);
+
+//     // Happy path 
+//     if(oppositeColourNeighbours.empty()) return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour));
+    
+//     Colour oppositeColour = board.get(oppositeColourNeighbours[0]);
+//     bool groupDeleted = false;
+
+//     for(auto& n : oppositeColourNeighbours) {
+//         std::vector<unsigned int> oppositeGroup = getGroup(board, n, oppositeColour);
+//         std::vector<unsigned int> oppositeGroupNeighbours = getGroupNeighbours(board, oppositeGroup, oppositeColour);
+//         std::vector<unsigned int> oppositeGroupLiberties = getLiberties(board, oppositeGroupNeighbours);
+
+//         // Delete opposite group as you have taken the last liberty 
+//         if(oppositeGroupLiberties.empty()) {
+//             if (std::string multiGroup = result.str(); multiGroup.find("dead") == std::string::npos){
+//                 result << "dead";
+//             }
+//             std::sort(oppositeGroup.begin(), oppositeGroup.end());
+//             for(auto& stone : oppositeGroup) {
+//                 result << " " << int(stone);
+//                 board.removeStone(stone);
+//             }
+//             groupDeleted = true;
+//         }
+//     }
+
+//     // If the neighbouring group wasn't deleted and there are no liberties around the placed stone
+//     if (!groupDeleted && liberties.empty()) {
+//         result << "invalid suicide";
+//         result << " " << latestPos << " " << std::to_string(static_cast<int>(latestColour));
+//         board.set(latestPos, Colour::CLEAR);
+//         return result.str();
+//     }
+
+//     return std::string("ok") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour)) + " " + result.str();
+// }
 
 #endif 

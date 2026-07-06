@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 
 enum class Colour : char {
     CLEAR = 0,
@@ -36,10 +37,14 @@ class Board {
     static bool isValidBoardSize(unsigned int);
     static bool isValidBoardValue(Colour);
 
+    void updateBoardHistory(std::vector<Colour>);
+
+    std::vector<Colour> board_history[2];
+
     private:
     std::vector<Colour> board;
     unsigned int width;
-
+    
 };
 
 #endif

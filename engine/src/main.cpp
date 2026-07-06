@@ -58,11 +58,10 @@ int main(int argc, char* argv[]) {
             int colour = std::stoi(colour_str);
 
             if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
-                if(board->placeStone(move, static_cast<Colour>(colour))) {
-                    std::cout << removeDeadStones(*board, move, static_cast<Colour>(colour)) << std::endl;
-                } else {
-                    std::cout << "invalid filled " << move << std::endl;
-                }
+                if(board->placeStone(move, static_cast<Colour>(colour))) std::cout << evaluateBoard(*board, move, static_cast<Colour>(colour)) << std::endl;
+
+                // Clean this? Pass place stone? Pass Fn?
+                else std::cout << evaluationResponse(MoveEvaluation::FILLED, move, static_cast<Colour>(colour), {}) << std::endl;
             }
         }
 

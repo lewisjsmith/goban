@@ -287,7 +287,7 @@ TEST(getOppositeColourNeighboursTest, Group) {
     ASSERT_EQ(got, want);    
 }
 
-TEST(removeDeadStonesTest, Group) {
+TEST(evaluateBoardTest, Group) {
     Board* board;
     std::string got;
     std::string want;
@@ -303,7 +303,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(18, Colour::WHITE);
     board->set(19, Colour::WHITE); 
 
-    got = removeDeadStones(*board, 19, Colour::WHITE);
+    got = evaluateBoard(*board, 19, Colour::WHITE);
     want = "ok 19 2 dead 0 1 9 10";
 
     ASSERT_EQ(got, want);
@@ -332,7 +332,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(58, Colour::WHITE);
     board->set(59, Colour::WHITE); 
 
-    got = removeDeadStones(*board, 40, Colour::WHITE);
+    got = evaluateBoard(*board, 40, Colour::WHITE);
     want = "ok 40 2 dead 30 31 32 39 41 48 49 50";
 
     ASSERT_EQ(got, want);
@@ -349,7 +349,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(29, Colour::WHITE);
     board->set(31, Colour::WHITE);
 
-    got = removeDeadStones(*board, 30 , Colour::BLACK);
+    got = evaluateBoard(*board, 30 , Colour::BLACK);
     want = "ok 30 1 dead 29 31";
 
     ASSERT_EQ(got, want);
@@ -378,7 +378,7 @@ TEST(removeDeadStonesTest, Group) {
     board->set(58, Colour::WHITE);
     board->set(59, Colour::WHITE); 
 
-    got = removeDeadStones(*board, 40, Colour::WHITE);
+    got = evaluateBoard(*board, 40, Colour::WHITE);
     want = "invalid suicide 40 2";
 
     ASSERT_EQ(got, want);

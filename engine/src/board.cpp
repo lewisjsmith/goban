@@ -3,15 +3,22 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <utility>
 
 #include "board.h"
 
 Board::Board() : width(9) {
     board = std::vector<Colour>(9*9, Colour::CLEAR); 
+    board_history[0] = board;
+    board_history[1] = board;
 }
 
 Board::Board(unsigned int size) : width(size) {
-    if(isValidBoardSize(size)) board = std::vector<Colour>(size*size, Colour::CLEAR);
+    if(isValidBoardSize(size)) {
+        board = std::vector<Colour>(size*size, Colour::CLEAR);
+        board_history[0] = board;
+        board_history[1] = board;
+    }
     else {
         throw std::runtime_error("Invalid board size");
     }
@@ -20,8 +27,9 @@ Board::Board(unsigned int size) : width(size) {
 bool Board::placeStone(unsigned int pos, Colour colour){
     Colour curr = get(pos);
     if(curr == Colour::CLEAR && (colour == Colour::BLACK || colour == Colour::WHITE)){ 
-        set(pos, colour);
-        return true;
+        if(set(pos, colour)) {
+            return true;
+        }   
     }
     return false;
 };
@@ -98,3 +106,8 @@ bool Board::isValidBoardValue(Colour colour) {
         colour == Colour::WHITE ||
         colour == Colour::CLEAR;
 }
+
+void Board::updateBoardHistory(std::vector<Colour> board_state) {
+        board_history[0] = board_history[1];
+        board_history[1] = board_state;
+    }
