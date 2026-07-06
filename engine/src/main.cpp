@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
             int move = std::stoi(move_str);
             int colour = std::stoi(colour_str);
             if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
-                if(board->set(move, static_cast<Colour>(colour))) {
+                if(board->placeStone(move, static_cast<Colour>(colour))) {
 
                     std::cout << removeDeadStones(*board, move, static_cast<Colour>(colour)) << std::endl;
 
@@ -101,11 +101,15 @@ int main(int argc, char* argv[]) {
             std::string board_state;
             iss >> board_state;
             
-            for(int i = 0; i < board_state.size(); i++) {
-                board->set(i, static_cast<Colour>(board_state[i])); 
+            for(unsigned int i = 0; i < board_state.size(); i++) {
+                board->set(i, static_cast<Colour>(board_state[i] - '0')); 
             }
 
-            std::cout << "ok load " << board_state << std::endl;
+            std::ostringstream oss;
+            for(auto& c : board->getBoardState()) {
+                oss << static_cast<int>(c);
+            }
+            std::cout << "ok load " << oss.str() << std::endl;
         }
 
         if(action == "quit") {
