@@ -50,7 +50,9 @@ int main(int argc, char* argv[]) {
             int colour = std::stoi(colour_str);
             if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
                 if(board->set(move, static_cast<Colour>(colour))) {
+
                     std::cout << removeDeadStones(*board, move, static_cast<Colour>(colour)) << std::endl;
+
                 } else {
                     std::cout << "invalid filled " << move << std::endl;
                 }
@@ -83,10 +85,11 @@ int main(int argc, char* argv[]) {
         if(action == "print") {
             
             std::ostringstream boardDebug;
+            std::vector<Colour> boardstate = board->getBoardState();
 
-            for(int i = 0; i < board->board.size(); i++) {
-                boardDebug << (int)board->board[i] << " ";
-                if((i+1)%board->width == 0) {
+            for(int i = 0; i < boardstate.size(); i++) {
+                boardDebug << (int)boardstate[i] << " ";
+                if((i+1)%board->getWidth() == 0) {
                    boardDebug << "\n";
                 }
             }

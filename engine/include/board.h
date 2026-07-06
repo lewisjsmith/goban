@@ -19,6 +19,11 @@ class Board {
     bool set(unsigned int, Colour); 
     Colour get(unsigned int) const;
 
+    const std::vector<Colour>& getBoardState();
+
+    unsigned int getWidth() const;
+    bool setWidth(unsigned int);
+
     bool placeStone(unsigned int, Colour);
     bool removeStone(unsigned int);
 
@@ -27,7 +32,7 @@ class Board {
     static bool isValidBoardSize(unsigned int);
     static bool isValidBoardValue(Colour);
 
-    // private:
+    private:
     std::vector<Colour> board;
     unsigned int width;
 

@@ -37,6 +37,20 @@ Colour Board::get(unsigned int pos) const {
     return board[pos];
 };
 
+const std::vector<Colour>& Board::getBoardState() {
+    return board;
+}
+
+unsigned int Board::getWidth() const {
+    return width;
+}
+
+bool Board::setWidth(unsigned int size) {
+    if(!isValidBoardSize(size)) return false;
+    width = size;
+    return true;
+}
+
 bool Board::isOutOfBounds(unsigned int pos) const {
     return pos >= (width*width);
 }
