@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
                 if(board->placeStone(move, static_cast<Colour>(colour))) std::cout << evaluateBoard(*board, move, static_cast<Colour>(colour)) << std::endl;
                 else std::cout << evaluationResponse(MoveEvaluation::FILLED, move, static_cast<Colour>(colour), {}) << std::endl;
             } else {
-                std::cout << "invalid piece value"
+                std::cout << "invalid piece value" << std::endl;
             }
         }
 
@@ -94,8 +94,15 @@ int main(int argc, char* argv[]) {
         if(action == "load") {
             std::string board_state;
             iss >> board_state;
-            board->setBoardState(board_state);
-            user_settings.saved_board = board->getBoardState();
+            if(board->setBoardState(board_state)) {
+                std::ostringstream oss;
+                for(auto& c : board->getBoardState()) {
+                    oss << static_cast<int>(c);
+                }
+                std::cout << "ok load " << oss.str() << std::endl;
+                user_settings.saved_board = board->getBoardState();
+            }
+            
         }
 
         if(action == "quit") {

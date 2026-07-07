@@ -60,13 +60,7 @@ bool Board::setBoardState(const std::string& boardState) {
         if(stone_colour != Colour::CLEAR && stone_colour != Colour::BLACK && stone_colour != Colour::WHITE) return false;
         set(i, stone_colour); 
     }
-
-    std::ostringstream oss;
-    for(auto& c : getBoardState()) {
-        oss << static_cast<int>(c);
-    }
-    std::cout << "ok load " << oss.str() << std::endl;
-
+    
     return true;
 }
 
