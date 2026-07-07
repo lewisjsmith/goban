@@ -37,7 +37,13 @@ class Board {
     static bool isValidBoardSize(unsigned int);
     static bool isValidBoardValue(Colour);
 
+    std::vector<Colour>* getBoardHistory();
+
     void updateBoardHistory(std::vector<Colour>);
+
+    bool undo();
+
+    std::string to_string(const std::vector<Colour>&);
 
     std::vector<Colour> board_history[2];
 

@@ -62,7 +62,6 @@ int main(int argc, char* argv[]) {
             if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
                 if(board->placeStone(move, static_cast<Colour>(colour))){ 
                     std::cout << evaluateBoard(*board, move, static_cast<Colour>(colour)) << std::endl;
-                    board->updateBoardHistory(board->getBoardState());
                 }
                 else std::cout << evaluationResponse(MoveEvaluation::FILLED, move, static_cast<Colour>(colour), {}) << std::endl;
             } else {
@@ -98,11 +97,8 @@ int main(int argc, char* argv[]) {
             std::string board_state;
             iss >> board_state;
             if(board->setBoardState(board_state)) {
-                std::ostringstream oss;
-                for(auto& c : board->getBoardState()) {
-                    oss << static_cast<int>(c);
-                }
-                std::cout << "ok load " << oss.str() << std::endl;
+                std::cout << "ok load " << \
+                    board->to_string(board->getBoardState()) << std::endl;
                 board->updateBoardHistory(board->getBoardState());
                 board->updateBoardHistory(board->getBoardState());
                 user_settings.saved_board = board->getBoardState();

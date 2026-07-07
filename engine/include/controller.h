@@ -117,7 +117,8 @@ std::vector<unsigned int> getOppositeColourNeighbours(const Board& board, std::v
 enum MoveEvaluation {
     OK,
     FILLED,
-    SUICIDE
+    SUICIDE,
+    KO
 };
 
 std::string evaluationResponse(MoveEvaluation eval, unsigned int latestPos, Colour latestColour, std::set<unsigned int> deadStones) {
@@ -140,8 +141,19 @@ std::string evaluationResponse(MoveEvaluation eval, unsigned int latestPos, Colo
         {
             return std::string("invalid suicide") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour));
         }
+        case MoveEvaluation::KO:
+        {
+            return std::string("invalid ko") + " " + std::to_string(latestPos) + " " + std::to_string(static_cast<int>(latestColour));
+        }
     }
     return "evaluation error";
+}
+
+bool isKoRepetition(Board& board) {
+    std::vector<Colour>* board_history = board.getBoardHistory();
+    if(board_history == nullptr) return false;
+    if(board_history[0] != board.getBoardState()) return false;
+    return true;
 }
 
 std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestColour) {
@@ -153,10 +165,13 @@ std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestCol
     std::set<unsigned int> deadStones;
 
     if(oppositeColourNeighbours.empty()){
-        if(board.board_history[0] != board.getBoardState()) return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+        if(!isKoRepetition(board)) {
+            board.updateBoardHistory(board.getBoardState());
+            return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+        }
         else {
-            board.board = board.board_history[1];
-            return std::string("Ko");
+            board.undo();
+            return evaluationResponse(MoveEvaluation::KO, latestPos, latestColour, deadStones);
         }
     } 
 
@@ -181,10 +196,13 @@ std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestCol
         return evaluationResponse(MoveEvaluation::SUICIDE, latestPos, latestColour, deadStones);
     }
 
-    if(board.board_history[0] != board.getBoardState()) return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+    if(!isKoRepetition(board)) {
+        board.updateBoardHistory(board.getBoardState());
+        return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+    }
     else {
-        board.board = board.board_history[1];
-        return std::string("Ko");
+        board.undo();
+        return evaluationResponse(MoveEvaluation::KO, latestPos, latestColour, deadStones);
     }
 }
 

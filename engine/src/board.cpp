@@ -99,12 +99,20 @@ bool Board::isValidBoardValue(Colour colour) {
         colour == Colour::CLEAR;
 }
 
+std::vector<Colour>* Board::getBoardHistory() {
+    return board_history;
+}
+
+bool Board::undo() {
+    board = board_history[1];
+}
+
 void Board::updateBoardHistory(std::vector<Colour> board_state) {
         board_history[0] = board_history[1];
         board_history[1] = board_state;
 }
 
-std::string to_string(std::vector<Colour> board_state) {
+std::string Board::to_string(const std::vector<Colour>& board_state) {
     std::ostringstream oss;
     for(auto& c : board_state) {
         oss << static_cast<int>(c);
