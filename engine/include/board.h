@@ -41,7 +41,7 @@ class Board {
 
     std::vector<Colour> board_history[2];
 
-    private:
+    // private:
     std::vector<Colour> board;
     unsigned int width;
     

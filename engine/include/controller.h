@@ -153,7 +153,11 @@ std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestCol
     std::set<unsigned int> deadStones;
 
     if(oppositeColourNeighbours.empty()){
-        return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+        if(board.board_history[0] != board.getBoardState()) return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+        else {
+            board.board = board.board_history[1];
+            return std::string("Ko");
+        }
     } 
 
     Colour oppositeColour = board.get(oppositeColourNeighbours[0]);
@@ -177,7 +181,11 @@ std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestCol
         return evaluationResponse(MoveEvaluation::SUICIDE, latestPos, latestColour, deadStones);
     }
 
-    return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+    if(board.board_history[0] != board.getBoardState()) return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
+    else {
+        board.board = board.board_history[1];
+        return std::string("Ko");
+    }
 }
 
 #endif 
