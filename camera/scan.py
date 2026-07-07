@@ -195,12 +195,13 @@ def manual_fix(image, board_points):
     
     return state["board_points"]
 
-def run_board_scan():
+def run_board_scan(pathstr):
 
     MODEL_PATH = Path(__file__).resolve().parent / "random_forest_model.pkl"
     model = joblib.load(MODEL_PATH)
 
-    IMAGE_PATH = Path(__file__).resolve().parent / "local/training/board_20260622-202257.jpg"
+    # local/training/board_20260622-202257.jpg
+    IMAGE_PATH = Path(__file__).resolve().parent / pathstr
     image = cv2.imread(IMAGE_PATH)
     
     strategy = AdaptiveStrategy()

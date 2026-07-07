@@ -3,6 +3,7 @@ import pygame
 import subprocess
 import threading
 import queue
+import sys
 
 from camera.scan import run_board_scan
 
@@ -226,16 +227,22 @@ def main():
     # pygame setup
     pygame.init()
 
-    init_board_size = 19
+    init_board_size = 9
+
+    if len(sys.argv) > 2:
+        print("Error invalid number of arguments passed to main")
+        return
+    if len(sys.argv) == 2:
+        init_board_size = 19
 
     # parallel exe thread
     engine = EngineWrapper(init_board_size)
     context = Context(init_board_size)
 
-    # Hard-coded scan
-    board_scan = run_board_scan()
-    board_scan_str = ''.join([f"{piece}" for piece in board_scan])
-    engine.send_command(f"load {board_scan_str}")
+    if len(sys.argv) == 2:
+        board_scan = run_board_scan(sys.argv[1])
+        board_scan_str = ''.join([f"{piece}" for piece in board_scan])
+        engine.send_command(f"load {board_scan_str}")
 
     # context = Context(13)
     # engine.send_command(f"resize 13")
