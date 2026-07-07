@@ -102,4 +102,12 @@ bool Board::isValidBoardValue(Colour colour) {
 void Board::updateBoardHistory(std::vector<Colour> board_state) {
         board_history[0] = board_history[1];
         board_history[1] = board_state;
+}
+
+std::string to_string(std::vector<Colour> board_state) {
+    std::ostringstream oss;
+    for(auto& c : board_state) {
+        oss << static_cast<int>(c);
     }
+    return oss.str();
+}
