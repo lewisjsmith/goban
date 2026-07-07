@@ -34,6 +34,8 @@ bool boardInit(unsigned int& size, int argc, char* argv[]) {
     return true;
 }
 
+    
+
 int main(int argc, char* argv[]) {
 
     Settings user_settings;
@@ -59,9 +61,9 @@ int main(int argc, char* argv[]) {
 
             if (Board::isValidBoardValue(static_cast<Colour>(colour))) {
                 if(board->placeStone(move, static_cast<Colour>(colour))) std::cout << evaluateBoard(*board, move, static_cast<Colour>(colour)) << std::endl;
-
-                // Clean this? Pass place stone? Pass Fn?
                 else std::cout << evaluationResponse(MoveEvaluation::FILLED, move, static_cast<Colour>(colour), {}) << std::endl;
+            } else {
+                std::cout << "invalid piece value"
             }
         }
 

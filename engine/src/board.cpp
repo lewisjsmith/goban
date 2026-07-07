@@ -27,9 +27,7 @@ Board::Board(unsigned int size) : width(size) {
 bool Board::placeStone(unsigned int pos, Colour colour){
     Colour curr = get(pos);
     if(curr == Colour::CLEAR && (colour == Colour::BLACK || colour == Colour::WHITE)){ 
-        if(set(pos, colour)) {
-            return true;
-        }   
+        return set(pos, colour);
     }
     return false;
 };
