@@ -39,7 +39,7 @@ class Board {
 
     std::vector<Colour>* getBoardHistory();
 
-    void updateBoardHistory(std::vector<Colour>);
+    void updateBoardHistory();
 
     bool undo();
 

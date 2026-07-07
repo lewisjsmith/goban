@@ -107,9 +107,9 @@ bool Board::undo() {
     board = board_history[1];
 }
 
-void Board::updateBoardHistory(std::vector<Colour> board_state) {
+void Board::updateBoardHistory() {
         board_history[0] = board_history[1];
-        board_history[1] = board_state;
+        board_history[1] = board;
 }
 
 std::string Board::to_string(const std::vector<Colour>& board_state) {

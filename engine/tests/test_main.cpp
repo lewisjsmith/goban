@@ -613,3 +613,32 @@ TEST(setBoardState, Set9x9) {
     success = board->setBoardState(input);
     ASSERT_EQ(success, false);
 }
+
+TEST(koRule, Repetiton) {
+    Board* board = new Board(9);
+    std::string input = std::string("000000000") + \
+                        std::string("000100000") + \
+                        std::string("001010000") + \
+                        std::string("002120000") + \
+                        std::string("000200000") + \
+                        std::string("000000000") + \
+                        std::string("000000000") + \
+                        std::string("000000000") + \
+                        std::string("000000000");
+    bool success = board->setBoardState(input);
+    EXPECT_EQ(success, true);
+
+    board->updateBoardHistory();
+    
+    board->placeStone(21, Colour::WHITE);
+    board->removeStone(30);
+    board->updateBoardHistory();
+    EXPECT_EQ(isKoRepetition(*board), false);
+    
+    board->placeStone(30, Colour::BLACK);
+    board->removeStone(21);
+    ASSERT_EQ(isKoRepetition(*board), true);
+    
+    std::string got = evaluateBoard(*board, 30, Colour::BLACK);
+    ASSERT_EQ(got, "invalid ko 30 1");
+}

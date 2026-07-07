@@ -166,7 +166,7 @@ std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestCol
 
     if(oppositeColourNeighbours.empty()){
         if(!isKoRepetition(board)) {
-            board.updateBoardHistory(board.getBoardState());
+            board.updateBoardHistory();
             return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
         }
         else {
@@ -197,7 +197,7 @@ std::string evaluateBoard(Board& board, unsigned int latestPos, Colour latestCol
     }
 
     if(!isKoRepetition(board)) {
-        board.updateBoardHistory(board.getBoardState());
+        board.updateBoardHistory();
         return evaluationResponse(MoveEvaluation::OK, latestPos, latestColour, deadStones);
     }
     else {

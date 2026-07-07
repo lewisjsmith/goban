@@ -99,8 +99,8 @@ int main(int argc, char* argv[]) {
             if(board->setBoardState(board_state)) {
                 std::cout << "ok load " << \
                     board->to_string(board->getBoardState()) << std::endl;
-                board->updateBoardHistory(board->getBoardState());
-                board->updateBoardHistory(board->getBoardState());
+                board->updateBoardHistory();
+                board->updateBoardHistory();
                 user_settings.saved_board = board->getBoardState();
             }
             
