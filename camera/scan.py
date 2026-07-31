@@ -114,6 +114,7 @@ SQUARE_WIDTH = int(GRID_AREA_WIDTH / 18)
 TRANSLATED_GRID_AREA_WIDTH = GRID_AREA_WIDTH + SQUARE_WIDTH
 AREA_OF_PLAY_WIDTH = int(GRID_AREA_WIDTH + (2*SQUARE_WIDTH))
 
+# 
 def getAreaOfPlay(image, points):
     ordered_points = np.array(order_points(points), dtype="float32")
     new_points = np.array(([SQUARE_WIDTH, SQUARE_WIDTH], [SQUARE_WIDTH, TRANSLATED_GRID_AREA_WIDTH], [TRANSLATED_GRID_AREA_WIDTH, TRANSLATED_GRID_AREA_WIDTH], [TRANSLATED_GRID_AREA_WIDTH, SQUARE_WIDTH]), dtype="float32")
@@ -124,9 +125,14 @@ def getAreaOfPlay(image, points):
 
     return area_of_play
 
-def scanBoard(boardImage, model, size):
+def scanBoard(boardImage, model, size=19):
     board = cv2.cvtColor(boardImage, cv2.COLOR_BGR2GRAY)
     board_state = []
+
+    if size == 9 or size == 13:
+        new_area = SQUARE_WIDTH*(size + 1)
+        excess = AREA_OF_PLAY_WIDTH - new_area
+        board = board[int(excess/2):new_area + int(excess/2), int(excess/2):new_area + int(excess/2)]
 
     for i in range(0, size):
         for j in range(0, size):
@@ -195,7 +201,7 @@ def manual_fix(image, board_points):
     
     return state["board_points"]
 
-def run_board_scan(pathstr):
+def run_board_scan(pathstr, size):
 
     MODEL_PATH = Path(__file__).resolve().parent / "random_forest_model.pkl"
     model = joblib.load(MODEL_PATH)
@@ -215,15 +221,15 @@ def run_board_scan(pathstr):
 
     board = getAreaOfPlay(image, board_points)
 
-    # Preview for debugging
-    # cv2.imshow('board', board)
-    # k = cv2.waitKey(0) & 0xFF
-    # if k in (27, ord('q')):
-    #     cv2.destroyAllWindows()
-
-    board_state = scanBoard(board, model, 19)
+    board_state = scanBoard(board, model, size)
 
     return board_state
 
 if __name__ == '__main__':
     run_board_scan()
+
+# Preview for debugging
+# cv2.imshow('board', board)
+# k = cv2.waitKey(0) & 0xFF
+# if k in (27, ord('q')):
+#     cv2.destroyAllWindows()

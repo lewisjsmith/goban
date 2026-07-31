@@ -227,20 +227,25 @@ def main():
     # pygame setup
     pygame.init()
 
-    init_board_size = 9
+    init_board_size = 19
 
-    if len(sys.argv) > 2:
+    if len(sys.argv) == 3:
+        init_board_size = int(sys.argv[2])
+        if init_board_size != 9 or init_board_size != 13 or init_board_size != 19:
+            print("Error invalid board size passed to main")
+            return    
+
+    if len(sys.argv) == 2 or len(sys.argv) > 3:
         print("Error invalid number of arguments passed to main")
         return
-    if len(sys.argv) == 2:
-        init_board_size = 19
 
     # parallel exe thread
     engine = EngineWrapper(init_board_size)
     context = Context(init_board_size)
 
-    if len(sys.argv) == 2:
-        board_scan = run_board_scan(sys.argv[1])
+    if len(sys.argv) == 3:
+        # Needs error checking for file load
+        board_scan = run_board_scan(sys.argv[1], init_board_size)
         board_scan_str = ''.join([f"{piece}" for piece in board_scan])
         engine.send_command(f"load {board_scan_str}")
 
