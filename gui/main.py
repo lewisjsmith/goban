@@ -46,7 +46,13 @@ class Context:
         self.state = [0] * (boardSize ** 2)
         self.blackStoneTurn = True
         self.canvas = self._generateBoardSurface(width)
-                
+        self.font = pygame.font.SysFont(None, 32)
+
+    def resize(self, boardSize):
+        self.boardSize = boardSize
+        self.canvas = self._generateBoardSurface(self.window.get_width())
+        self.reset()
+
     def _generateBoardSurface(self, width):
         surface = pygame.Surface((width/2, width/2))
 
@@ -147,11 +153,86 @@ def paintHover(context: Context):
                     (pos[0] + width/4, pos[1] + (height - width/2)/2), 
                     square_width/2,
                     4
-                )    
+                )
+
+SHORTCUTS = [
+    "R - Reset board",
+    "Q - Quit",
+]
+
+def paintShortcuts(context: Context):
+    width, height = context.window.get_size()
+
+    title = "Keyboard shortcuts"
+    shortcuts = SHORTCUTS
+
+    colour = (0, 0, 0)
+    line_height = context.font.get_linesize()
+    bullet_indent = 30
+    bullet_radius = 4
+
+    title_surface = context.font.render(title, True, colour)
+    shortcut_surfaces = [context.font.render(text, True, colour) for text in shortcuts]
+
+    block_width = max(
+        title_surface.get_width(),
+        bullet_indent + max(surface.get_width() for surface in shortcut_surfaces)
+    )
+    block_height = line_height * (1 + len(shortcuts))
+
+    # centre the block in the area to the right of the board, lines left aligned
+    left_x = width * 7/8 - block_width / 2
+    top_y = (height - block_height) / 2
+
+    context.window.blit(title_surface, (left_x, top_y))
+
+    for i, surface in enumerate(shortcut_surfaces):
+        line_y = top_y + (i + 1) * line_height
+        pygame.draw.circle(
+            context.window,
+            colour,
+            (left_x + bullet_indent / 2, line_y + line_height / 2),
+            bullet_radius
+        )
+        context.window.blit(surface, (left_x + bullet_indent, line_y))
+
+def boardSizeButtons(context: Context):
+    width, height = context.window.get_size()
+
+    sizes = (9, 13, 19)
+    button_width = 80
+    button_height = 40
+    gap = 15
+    margin = 30
+
+    row_width = len(sizes) * button_width + (len(sizes) - 1) * gap
+
+    # centre the row in the area to the right of the board, below the shortcuts
+    shortcuts_bottom = (height + context.font.get_linesize() * (1 + len(SHORTCUTS))) / 2
+    left_x = width * 7/8 - row_width / 2
+    top_y = shortcuts_bottom + margin
+
+    return [
+        (size, pygame.Rect(left_x + i * (button_width + gap), top_y, button_width, button_height))
+        for i, size in enumerate(sizes)
+    ]
+
+def paintButtons(context: Context):
+    for size, rect in boardSizeButtons(context):
+        fill = (210, 180, 140) if size == context.boardSize else (230, 230, 230)
+        pygame.draw.rect(context.window, fill, rect, border_radius=6)
+        pygame.draw.rect(context.window, (0, 0, 0), rect, 2, border_radius=6)
+
+        label = context.font.render(f"{size}x{size}", True, (0, 0, 0))
+        context.window.blit(label, label.get_rect(center=rect.center))
 
 def eventHandler(context: Context, engine: EngineWrapper):
     for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    for size, rect in boardSizeButtons(context):
+                        if rect.collidepoint(event.pos) and size != context.boardSize:
+                            engine.send_command(f"resize {size}")
+
                     pos = posToStone(context, pygame.mouse.get_pos())
                     if pos[0] is not None:
 
@@ -192,10 +273,9 @@ def engineHandler(context: Context, engine: EngineWrapper):
             if words[0] == "ok":
 
                 if words[1] == "resize":
-                    context.boardSize = int(words[2])
-                    context.reset()
+                    context.resize(int(words[2]))
 
-                if words[1] == "load":
+                elif words[1] == "load":
                     context.state = []
                     for piece in words[2]:
                         context.state.append(int(piece))
@@ -217,6 +297,8 @@ def updateDisplay(context: Context):
     paintBoard(context)
     paintStones(context)
     paintHover(context)
+    paintShortcuts(context)
+    paintButtons(context)
     pygame.display.flip()
 
 def cleanUp(engine: EngineWrapper):
@@ -231,7 +313,7 @@ def main():
 
     if len(sys.argv) == 3:
         init_board_size = int(sys.argv[2])
-        if init_board_size != 9 or init_board_size != 13 or init_board_size != 19:
+        if init_board_size not in (9, 13, 19):
             print("Error invalid board size passed to main")
             return    
 
