@@ -4,6 +4,7 @@ import subprocess
 import threading
 import queue
 import sys
+from tkinter import filedialog
 
 from camera.scan import run_board_scan
 
@@ -158,6 +159,7 @@ def paintHover(context: Context):
 SHORTCUTS = [
     "R - Reset board",
     "Q - Quit",
+    "L - Load a board",
 ]
 
 def paintShortcuts(context: Context):
@@ -258,6 +260,12 @@ def eventHandler(context: Context, engine: EngineWrapper):
                     if event.key == pygame.K_q:
                         return False
 
+                    if event.key == pygame.K_l:
+                        filename = filedialog.askopenfilename()
+                        if len(filename):
+                            board_scan = run_board_scan(filename, context.boardSize)
+                            board_scan_str = ''.join([f"{piece}" for piece in board_scan])
+                            engine.send_command(f"load {board_scan_str}")
 
                 if event.type == pygame.QUIT:
                     return False
